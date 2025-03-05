@@ -34,9 +34,12 @@ import {
   Check,
   X,
   FileJson,
+  Copy,
 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { Textarea } from "@/components/ui/textarea";
+import { hslToHex } from "@/lib/utils";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 // Debug utility function
 const debugPalette = (palette: Palette) => {
@@ -341,12 +344,46 @@ export function PaletteManager() {
             : 0.5,
       };
 
-      // First apply the imported palette data to the store
+      // Apply the imported palette data to the store
       setLightColors(newPalette.lightColors);
       setDarkColors(newPalette.darkColors);
       setBorderRadius(newPalette.borderRadius);
 
-      // Then save the palette to the database
+      // Apply colors to CSS variables
+      const root = document.documentElement;
+      const isDarkModeActive =
+        document.documentElement.classList.contains("dark");
+      const colors = isDarkModeActive
+        ? newPalette.darkColors
+        : newPalette.lightColors;
+
+      // First, clear any existing inline styles to ensure clean application
+      root.style.cssText = "";
+
+      // Apply border radius
+      root.style.setProperty("--radius", `${newPalette.borderRadius}rem`);
+
+      // Apply colors based on current theme
+      Object.entries(colors).forEach(([key, value]) => {
+        root.style.setProperty(key, value as string);
+      });
+
+      // Apply dark colors inside the .dark selector scope
+      const darkModeStyles = Object.entries(newPalette.darkColors)
+        .map(([key, value]) => `${key}: ${value as string};`)
+        .join(" ");
+
+      // Create and append a style element with dark mode colors
+      const styleId = "theme-dark-colors";
+      let styleEl = document.getElementById(styleId) as HTMLStyleElement;
+      if (!styleEl) {
+        styleEl = document.createElement("style");
+        styleEl.id = styleId;
+        document.head.appendChild(styleEl);
+      }
+      styleEl.textContent = `.dark {\n  ${darkModeStyles}\n}`;
+
+      // Save the palette to the database
       const id = await savePalette(newPalette.name);
 
       // Close the dialog and reset the import data
@@ -361,6 +398,28 @@ export function PaletteManager() {
       console.error("Error importing palette:", error);
       setImportError("An error occurred while importing the palette");
     }
+  };
+
+  // Handle copying color value to clipboard
+  const copyToClipboard = (value: string, label: string) => {
+    navigator.clipboard.writeText(value).then(
+      () => {
+        toast({
+          title: "Copied to clipboard",
+          description: `${label} has been copied to your clipboard.`,
+          duration: 2000,
+        });
+      },
+      (err) => {
+        console.error("Could not copy text: ", err);
+        toast({
+          title: "Failed to copy",
+          description: "Could not copy to clipboard. Please try again.",
+          variant: "destructive",
+          duration: 2000,
+        });
+      }
+    );
   };
 
   return (
@@ -433,8 +492,8 @@ export function PaletteManager() {
                         key={palette.id}
                         className="flex items-center justify-between p-3 border rounded-md"
                       >
-                        <div className="flex items-center space-x-3">
-                          <div className="flex space-x-1">
+                        <div className="flex items-center space-x-3 gap-3">
+                          <div className="flex space-x-2 items-center">
                             {Object.entries(palette.lightColors)
                               .filter(
                                 ([key]) =>
@@ -456,6 +515,65 @@ export function PaletteManager() {
                             <p className="text-xs text-muted-foreground">
                               {new Date(palette.createdAt).toLocaleDateString()}
                             </p>
+                          </div>
+                          <div className="flex gap-2">
+                            {Object.entries(palette.lightColors)
+                              .filter(([key]) => key === "--primary")
+                              .map(([key, value]) => {
+                                // Parse HSL values correctly
+                                const hslParts = value.split(" ");
+                                const h = parseFloat(hslParts[0]);
+                                const s = parseFloat(
+                                  hslParts[1].replace("%", "")
+                                );
+                                const l = parseFloat(
+                                  hslParts[2].replace("%", "")
+                                );
+                                
+                                const hexValue = `#${hslToHex(h, s, l)}`;
+                                const hslValue = value;
+                                const colorName = key.replace("--", "");
+
+                                return (
+                                  <div
+                                    key={key}
+                                    className="text-xs flex flex-col gap-1"
+                                    title={colorName}
+                                  >
+                                    <TooltipProvider>
+                                      <Tooltip>
+                                        <TooltipTrigger asChild>
+                                          <span 
+                                            className="font-medium cursor-pointer hover:text-primary transition-colors duration-200 hover:underline"
+                                            onClick={() => copyToClipboard(hexValue, `Hex color (${colorName})`)}
+                                          >
+                                            {hexValue}
+                                          </span>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                          <p>Click to copy hex value</p>
+                                        </TooltipContent>
+                                      </Tooltip>
+                                    </TooltipProvider>
+                                    
+                                    <TooltipProvider>
+                                      <Tooltip>
+                                        <TooltipTrigger asChild>
+                                          <span 
+                                            className="text-muted-foreground ml-1 cursor-pointer hover:text-muted-foreground/80 transition-colors duration-200 hover:underline"
+                                            onClick={() => copyToClipboard(`hsl(${hslValue})`, `HSL color (${colorName})`)}
+                                          >
+                                            (hsl: {value})
+                                          </span>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                          <p>Click to copy HSL value</p>
+                                        </TooltipContent>
+                                      </Tooltip>
+                                    </TooltipProvider>
+                                  </div>
+                                );
+                              })}
                           </div>
                         </div>
                         <div className="flex space-x-2">
