@@ -39,7 +39,7 @@ import { generateColorPalette } from "@/lib/utils"
 import { getDefaultColors } from "@/lib/theme-config"
 
 export default function ThemeShowcase() {
-  const [isDarkMode, setIsDarkMode] = useState(false)
+  const [isDarkMode, setIsDarkMode] = useState(true)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [placeholderDialogOpen, setPlaceholderDialogOpen] = useState(false)
   const [lightColors, setLightColors] = useState(() => {
