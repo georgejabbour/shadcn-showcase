@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Moon, Sun } from "lucide-react"
+import { Moon, Sun, ChevronDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/dialog"
 import { ThemeCustomizer } from "./color-picker"
 import { ColorPaletteGenerator } from "./color-palette-generator"
+import { PaletteManager } from "./palette-manager"
 import { BarChartDemo } from "./charts/bar-chart"
 import { LineChartDemo } from "./charts/line-chart"
 import { PieChartDemo } from "./charts/pie-chart"
@@ -37,6 +38,7 @@ import { SidebarProvider, SidebarTrigger } from "./ui/sidebar"
 import { Toaster } from "./ui/toaster"
 import { generateColorPalette } from "@/lib/utils"
 import { getDefaultColors } from "@/lib/theme-config"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 
 export default function ThemeShowcase() {
   const [isDarkMode, setIsDarkMode] = useState(true)
@@ -183,10 +185,11 @@ export default function ThemeShowcase() {
               </header>
 
               <div className="container mx-auto px-0 max-w-[1200px]">
-                <Tabs defaultValue="customizer" className="w-full mb-8">
-                  <TabsList className="grid grid-cols-2 mb-4">
-                    <TabsTrigger value="customizer">Theme Customizer</TabsTrigger>
+                <Tabs defaultValue="generator" className="w-full mb-8">
+                  <TabsList>
                     <TabsTrigger value="generator">Palette Generator</TabsTrigger>
+                    <TabsTrigger value="customizer">Theme Customizer</TabsTrigger>
+                    <TabsTrigger value="manager">Palette Manager</TabsTrigger>
                   </TabsList>
                   <TabsContent value="customizer">
                     <ThemeCustomizer
@@ -203,13 +206,16 @@ export default function ThemeShowcase() {
                   <TabsContent value="generator">
                     <Card>
                       <CardHeader>
-                        <CardTitle>Color Palette Generator</CardTitle>
+                        <CardTitle>Palette Generator</CardTitle>
                         <CardDescription>Generate a complete theme from a single color</CardDescription>
                       </CardHeader>
                       <CardContent>
                         <ColorPaletteGenerator onApplyPalette={applyGeneratedPalette} />
                       </CardContent>
                     </Card>
+                  </TabsContent>
+                  <TabsContent value="manager">
+                    <PaletteManager />
                   </TabsContent>
                 </Tabs>
 
@@ -611,26 +617,31 @@ export default function ThemeShowcase() {
                     <section>
                       <h2 className="text-2xl font-semibold mb-4">Dropdown Menu (Open by Default)</h2>
                       <div className="relative">
-                        <Button variant="outline" className="w-[200px] justify-between">
-                          Open Menu
-                          <span className="sr-only">Toggle menu</span>
-                        </Button>
-                        <div className="absolute top-full left-0 z-10 mt-2 w-[200px] rounded-md border bg-popover p-1 text-popover-foreground shadow-md">
-                          <div className="px-2 py-1.5 text-sm font-semibold">My Account</div>
-                          <div className="h-px my-1 bg-muted"></div>
-                          <button className="relative flex w-full cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent hover:text-accent-foreground">
-                            Profile
-                          </button>
-                          <button className="relative flex w-full cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent hover:text-accent-foreground">
-                            Billing
-                          </button>
-                          <button className="relative flex w-full cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent hover:text-accent-foreground">
-                            Team
-                          </button>
-                          <button className="relative flex w-full cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent hover:text-accent-foreground">
-                            Subscription
-                          </button>
-                        </div>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="outline" className="w-[200px] justify-between">
+                              Open Menu
+                              <ChevronDown className="ml-2 h-4 w-4" />
+                              <span className="sr-only">Toggle menu</span>
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent className="w-[200px]">
+                            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem>
+                              Profile
+                            </DropdownMenuItem>
+                            <DropdownMenuItem>
+                              Billing
+                            </DropdownMenuItem>
+                            <DropdownMenuItem>
+                              Team
+                            </DropdownMenuItem>
+                            <DropdownMenuItem>
+                              Subscription
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </div>
                     </section>
 
