@@ -66,6 +66,9 @@ export function PaletteManager() {
     loadPalette,
     loadSavedPalettes,
     deletePalette,
+    setLightColors,
+    setDarkColors,
+    setBorderRadius,
   } = usePaletteStore();
 
   const [paletteName, setPaletteName] = useState("");
@@ -327,7 +330,7 @@ export function PaletteManager() {
         paletteData.darkColors = {};
       }
 
-      // Save the imported palette with the data from the JSON
+      // Create a new palette object with the imported data
       const newPalette = {
         name: paletteData.name as string,
         lightColors: paletteData.lightColors,
@@ -338,11 +341,13 @@ export function PaletteManager() {
             : 0.5,
       };
 
-      // Save the palette to the database
-      const id = await savePalette(newPalette.name);
+      // First apply the imported palette data to the store
+      setLightColors(newPalette.lightColors);
+      setDarkColors(newPalette.darkColors);
+      setBorderRadius(newPalette.borderRadius);
 
-      // Apply the imported palette
-      await loadPalette(id);
+      // Then save the palette to the database
+      const id = await savePalette(newPalette.name);
 
       // Close the dialog and reset the import data
       setImportDialogOpen(false);
