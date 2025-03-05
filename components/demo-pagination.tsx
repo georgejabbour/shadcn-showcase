@@ -27,9 +27,6 @@ export function DemoPagination() {
               </PaginationLink>
             </PaginationItem>
             <PaginationItem>
-              <PaginationLink href="#">3</PaginationLink>
-            </PaginationItem>
-            <PaginationItem>
               <PaginationEllipsis />
             </PaginationItem>
             <PaginationItem>

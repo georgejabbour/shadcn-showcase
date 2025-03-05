@@ -368,7 +368,6 @@ function GradientShowcase() {
 
 interface ThemeCustomizerProps {
   isDarkMode: boolean;
-  onReset: () => void;
   lightColors: Record<string, string>;
   darkColors: Record<string, string>;
   setLightColors: (colors: Record<string, string>) => void;
@@ -502,7 +501,6 @@ function ColorCategory({
 
 export function ThemeCustomizer({
   isDarkMode,
-  onReset,
   lightColors,
   darkColors,
   setLightColors,
@@ -594,9 +592,6 @@ export function ThemeCustomizer({
           </h2>
         </div>
         <div className="flex flex-col sm:flex-row gap-2 justify-between items-start sm:items-center mb-4">
-          <Button variant="destructive" size="sm" onClick={onReset}>
-            Reset to Default
-          </Button>
           <div className="relative w-full sm:w-auto">
             <Input
               placeholder="Search colors..."

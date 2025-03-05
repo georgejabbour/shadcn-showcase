@@ -78,7 +78,8 @@ export default function ThemeShowcase() {
     setBorderRadius,
     resetTheme: storeResetTheme,
     loadSavedPalettes,
-    showActionsContainer, setShowActionsContainer
+    showActionsContainer,
+    setShowActionsContainer,
   } = usePaletteStore();
 
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -223,14 +224,18 @@ export default function ThemeShowcase() {
 
               <div className="container mx-auto px-0 max-w-[1200px]">
                 <Tabs defaultValue="generator" className="w-full mb-8">
-                  <div className="overflow-x-auto pb-2 mb-2">
+                  <div className="flex flex-wrap items-center gap-4 justify-between pb-2 mb-2">
                     <TabsList className="flex w-fit">
                       <TabsTrigger value="generator">
-                        <span className="hidden md:block">Palette Generator</span>
+                        <span className="hidden md:block">
+                          Palette Generator
+                        </span>
                         <span className="block md:hidden">Palet. Gen.</span>
                       </TabsTrigger>
                       <TabsTrigger value="customizer">
-                        <span className="hidden md:block">Theme Customizer</span>
+                        <span className="hidden md:block">
+                          Theme Customizer
+                        </span>
                         <span className="block md:hidden">Theme Cust.</span>
                       </TabsTrigger>
                       <TabsTrigger value="manager">
@@ -238,11 +243,17 @@ export default function ThemeShowcase() {
                         <span className="block md:hidden">Palet. Mgr</span>
                       </TabsTrigger>
                     </TabsList>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={resetTheme}
+                    >
+                      Reset to Default
+                    </Button>
                   </div>
                   <TabsContent value="customizer">
                     <ThemeCustomizer
                       isDarkMode={isDarkMode}
-                      onReset={resetTheme}
                       lightColors={lightColors}
                       darkColors={darkColors}
                       setLightColors={setLightColors}
@@ -291,567 +302,627 @@ export default function ThemeShowcase() {
                   </TabsContent>
                 </Tabs>
 
-                <Tabs defaultValue="buttons" className="w-full">
-                  <div className="overflow-x-auto pb-2 mb-6">
-                    <TabsList className="flex flex-wrap h-fit w-fit items-center justify-start">
-                      <TabsTrigger value="buttons">Buttons</TabsTrigger>
-                      <TabsTrigger value="inputs">Inputs</TabsTrigger>
-                      <TabsTrigger value="cards">Cards</TabsTrigger>
-                      <TabsTrigger value="feedback">Feedback</TabsTrigger>
-                      <TabsTrigger value="charts">Charts</TabsTrigger>
-                      <TabsTrigger value="navigation">Navigation</TabsTrigger>
-                      <TabsTrigger value="misc">Misc</TabsTrigger>
-                    </TabsList>
-                  </div>
-
-                  <TabsContent value="buttons" className="space-y-8">
-                    <section>
-                      <h2 className="text-2xl font-semibold mb-4">
-                        Button Variants
-                      </h2>
-                      <div className="grid gap-4" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(120px, 150px))" }}>
-                        <div className="space-y-4">
-                          <h3 className="text-lg font-medium">Default</h3>
-                          <div className="flex flex-col gap-2">
-                            <Button>Default Button</Button>
-                            <Button className="bg-primary/90">
-                              Hovered (Simulated)
-                            </Button>
-                            <Button disabled>Disabled</Button>
-                          </div>
-                        </div>
-
-                        <div className="space-y-4">
-                          <h3 className="text-lg font-medium">Secondary</h3>
-                          <div className="flex flex-col gap-2">
-                            <Button variant="secondary">Secondary</Button>
-                            <Button
-                              variant="secondary"
-                              className="bg-secondary/80"
-                            >
-                              Hovered (Simulated)
-                            </Button>
-                            <Button variant="secondary" disabled>
-                              Disabled
-                            </Button>
-                          </div>
-                        </div>
-
-                        <div className="space-y-4">
-                          <h3 className="text-lg font-medium">Destructive</h3>
-                          <div className="flex flex-col gap-2">
-                            <Button variant="destructive">Destructive</Button>
-                            <Button
-                              variant="destructive"
-                              className="bg-destructive/90"
-                            >
-                              Hovered (Simulated)
-                            </Button>
-                            <Button variant="destructive" disabled>
-                              Disabled
-                            </Button>
-                          </div>
-                        </div>
-
-                        <div className="space-y-4">
-                          <h3 className="text-lg font-medium">Outline</h3>
-                          <div className="flex flex-col gap-2">
-                            <Button variant="outline">Outline</Button>
-                            <Button
-                              variant="outline"
-                              className="bg-accent text-accent-foreground"
-                            >
-                              Hovered (Simulated)
-                            </Button>
-                            <Button variant="outline" disabled>
-                              Disabled
-                            </Button>
-                          </div>
-                        </div>
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Theme Showcase</CardTitle>
+                    <CardDescription>
+                      Sample Shadcn UI components to showcase the color palette
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Tabs defaultValue="buttons" className="w-full">
+                      <div className="overflow-x-auto pb-2 mb-6">
+                        <TabsList className="flex flex-wrap h-fit w-fit items-center justify-start">
+                          <TabsTrigger value="buttons">Buttons</TabsTrigger>
+                          <TabsTrigger value="inputs">Inputs</TabsTrigger>
+                          <TabsTrigger value="cards">Cards</TabsTrigger>
+                          <TabsTrigger value="feedback">Feedback</TabsTrigger>
+                          <TabsTrigger value="charts">Charts</TabsTrigger>
+                          <TabsTrigger value="navigation">
+                            Navigation
+                          </TabsTrigger>
+                          <TabsTrigger value="misc">Misc</TabsTrigger>
+                        </TabsList>
                       </div>
-                    </section>
 
-                    <section>
-                      <h2 className="text-2xl font-semibold mb-4">
-                        Button Sizes
-                      </h2>
-                      <div className="flex flex-wrap gap-4 items-center">
-                        <Button size="sm">Small</Button>
-                        <Button>Default</Button>
-                        <Button size="lg">Large</Button>
-                        <Button size="icon">
-                          <Sun className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </section>
-                  </TabsContent>
-
-                  <TabsContent value="inputs" className="space-y-8">
-                    <section>
-                      <h2 className="text-2xl font-semibold mb-4">
-                        Form Elements
-                      </h2>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div className="space-y-6">
-                          <div className="space-y-2">
-                            <Label htmlFor="default-input">Default Input</Label>
-                            <Input
-                              id="default-input"
-                              placeholder="Default input"
-                            />
-                          </div>
-
-                          <div className="space-y-2">
-                            <Label htmlFor="focused-input">
-                              Focused Input (Simulated)
-                            </Label>
-                            <Input
-                              id="focused-input"
-                              placeholder="Focused input"
-                              className="ring-2 ring-ring ring-offset-2 ring-offset-background"
-                            />
-                          </div>
-
-                          <div className="space-y-2">
-                            <Label htmlFor="disabled-input">
-                              Disabled Input
-                            </Label>
-                            <Input
-                              id="disabled-input"
-                              placeholder="Disabled input"
-                              disabled
-                            />
-                          </div>
-
-                          <div className="space-y-2">
-                            <Label htmlFor="with-value">Input with Value</Label>
-                            <Input id="with-value" value="This is a value" />
-                          </div>
-                        </div>
-
-                        <div className="space-y-6">
-                          <div className="space-y-4">
-                            <Label>Checkbox</Label>
-                            <div className="flex items-center space-x-2">
-                              <Checkbox id="terms" />
-                              <label
-                                htmlFor="terms"
-                                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                              >
-                                Accept terms and conditions
-                              </label>
+                      <TabsContent value="buttons" className="space-y-8">
+                        <section>
+                          <h2 className="text-2xl font-semibold mb-4">
+                            Button Variants
+                          </h2>
+                          <div
+                            className="grid gap-3"
+                            style={{
+                              gridTemplateColumns:
+                                "repeat(auto-fit, minmax(100px, 120px))",
+                            }}
+                          >
+                            <div className="space-y-4">
+                              <h3 className="text-lg font-medium">Default</h3>
+                              <div className="flex flex-col gap-2">
+                                <Button>Default Button</Button>
+                                <Button className="bg-primary/90">
+                                  Hovered
+                                </Button>
+                                <Button disabled>Disabled</Button>
+                              </div>
                             </div>
-                            <div className="flex items-center space-x-2">
-                              <Checkbox id="terms-disabled" disabled />
-                              <label
-                                htmlFor="terms-disabled"
-                                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                              >
-                                Disabled checkbox
-                              </label>
+
+                            <div className="space-y-4">
+                              <h3 className="text-lg font-medium">Secondary</h3>
+                              <div className="flex flex-col gap-2">
+                                <Button variant="secondary">Secondary</Button>
+                                <Button
+                                  variant="secondary"
+                                  className="bg-secondary/80"
+                                >
+                                  Hovered
+                                </Button>
+                                <Button variant="secondary" disabled>
+                                  Disabled
+                                </Button>
+                              </div>
+                            </div>
+
+                            <div className="space-y-4">
+                              <h3 className="text-lg font-medium">
+                                Destructive
+                              </h3>
+                              <div className="flex flex-col gap-2">
+                                <Button variant="destructive">
+                                  Destructive
+                                </Button>
+                                <Button
+                                  variant="destructive"
+                                  className="bg-destructive/90"
+                                >
+                                  Hovered
+                                </Button>
+                                <Button variant="destructive" disabled>
+                                  Disabled
+                                </Button>
+                              </div>
+                            </div>
+
+                            <div className="space-y-4">
+                              <h3 className="text-lg font-medium">Outline</h3>
+                              <div className="flex flex-col gap-2">
+                                <Button variant="outline">Outline</Button>
+                                <Button
+                                  variant="outline"
+                                  className="bg-accent text-accent-foreground"
+                                >
+                                  Hovered
+                                </Button>
+                                <Button variant="outline" disabled>
+                                  Disabled
+                                </Button>
+                              </div>
                             </div>
                           </div>
+                        </section>
 
-                          <div className="space-y-4">
-                            <Label>Radio Group</Label>
-                            <RadioGroup defaultValue="option-one">
-                              <div className="flex items-center space-x-2">
-                                <RadioGroupItem
-                                  value="option-one"
-                                  id="option-one"
+                        <section>
+                          <h2 className="text-2xl font-semibold mb-4">
+                            Button Sizes
+                          </h2>
+                          <div className="flex flex-wrap gap-4 items-center">
+                            <Button size="sm">Small</Button>
+                            <Button>Default</Button>
+                            <Button size="lg">Large</Button>
+                            <Button size="icon">
+                              <Sun className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </section>
+                      </TabsContent>
+
+                      <TabsContent value="inputs" className="space-y-8">
+                        <section>
+                          <h2 className="text-2xl font-semibold mb-4">
+                            Form Elements
+                          </h2>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div className="space-y-6">
+                              <div className="space-y-2">
+                                <Label htmlFor="default-input">
+                                  Default Input
+                                </Label>
+                                <Input
+                                  id="default-input"
+                                  placeholder="Default input"
                                 />
-                                <Label htmlFor="option-one">Option One</Label>
                               </div>
-                              <div className="flex items-center space-x-2">
-                                <RadioGroupItem
-                                  value="option-two"
-                                  id="option-two"
+
+                              <div className="space-y-2">
+                                <Label htmlFor="focused-input">
+                                  Focused Input (Simulated)
+                                </Label>
+                                <Input
+                                  id="focused-input"
+                                  placeholder="Focused input"
+                                  className="ring-2 ring-ring ring-offset-2 ring-offset-background"
                                 />
-                                <Label htmlFor="option-two">Option Two</Label>
                               </div>
-                              <div className="flex items-center space-x-2">
-                                <RadioGroupItem
-                                  value="option-three"
-                                  id="option-three"
+
+                              <div className="space-y-2">
+                                <Label htmlFor="disabled-input">
+                                  Disabled Input
+                                </Label>
+                                <Input
+                                  id="disabled-input"
+                                  placeholder="Disabled input"
                                   disabled
                                 />
-                                <Label
-                                  htmlFor="option-three"
-                                  className="opacity-70"
-                                >
-                                  Disabled Option
-                                </Label>
                               </div>
-                            </RadioGroup>
-                          </div>
 
-                          <div className="space-y-4">
-                            <Label>Switch</Label>
-                            <div className="flex items-center space-x-2">
-                              <Switch id="airplane-mode" />
-                              <Label htmlFor="airplane-mode">
-                                Airplane Mode
-                              </Label>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                              <Switch id="disabled-switch" disabled />
-                              <Label
-                                htmlFor="disabled-switch"
-                                className="opacity-70"
-                              >
-                                Disabled Switch
-                              </Label>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </section>
-
-                    <section>
-                      <h2 className="text-2xl font-semibold mb-4">
-                        Select & Slider
-                      </h2>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div className="space-y-4">
-                          <Label>Select</Label>
-                          <Select>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select an option" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="option1">Option 1</SelectItem>
-                              <SelectItem value="option2">Option 2</SelectItem>
-                              <SelectItem value="option3">Option 3</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-
-                        <div className="space-y-4">
-                          <Label>Slider</Label>
-                          <Slider defaultValue={[50]} max={100} step={1} />
-                        </div>
-                      </div>
-                    </section>
-                  </TabsContent>
-
-                  <TabsContent value="cards" className="space-y-8">
-                    <section>
-                      <h2 className="text-2xl font-semibold mb-4">Cards</h2>
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <Card>
-                          <CardHeader>
-                            <CardTitle>Default Card</CardTitle>
-                            <CardDescription>
-                              This is a default card component
-                            </CardDescription>
-                          </CardHeader>
-                          <CardContent>
-                            <p>
-                              Card content goes here. This shows the default
-                              styling of the card component.
-                            </p>
-                          </CardContent>
-                          <CardFooter className="flex justify-between">
-                            <Button variant="outline">Cancel</Button>
-                            <Button>Submit</Button>
-                          </CardFooter>
-                        </Card>
-
-                        <Card className="border-primary">
-                          <CardHeader className="bg-primary/5">
-                            <CardTitle>Primary Accent</CardTitle>
-                            <CardDescription>
-                              Card with primary color accent
-                            </CardDescription>
-                          </CardHeader>
-                          <CardContent>
-                            <p>
-                              This card has a primary color border and header
-                              background.
-                            </p>
-                          </CardContent>
-                          <CardFooter className="flex justify-between">
-                            <Button variant="outline">Cancel</Button>
-                            <Button>Submit</Button>
-                          </CardFooter>
-                        </Card>
-
-                        <Card className="border-destructive">
-                          <CardHeader className="bg-destructive/5">
-                            <CardTitle>Destructive Accent</CardTitle>
-                            <CardDescription>
-                              Card with destructive color accent
-                            </CardDescription>
-                          </CardHeader>
-                          <CardContent>
-                            <p>
-                              This card has a destructive color border and
-                              header background.
-                            </p>
-                          </CardContent>
-                          <CardFooter className="flex justify-between">
-                            <Button variant="outline">Cancel</Button>
-                            <Button variant="destructive">Delete</Button>
-                          </CardFooter>
-                        </Card>
-                      </div>
-                    </section>
-
-                    <section className="mt-8">
-                      <h2 className="text-2xl font-semibold mb-4">
-                        Card with Placeholder Data
-                      </h2>
-                      <Card className="max-w-md">
-                        <CardHeader>
-                          <CardTitle>Project Statistics</CardTitle>
-                          <CardDescription>
-                            Overview of your project metrics for the last 30
-                            days
-                          </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="space-y-4">
-                            <div className="flex justify-between items-center">
-                              <span className="text-sm font-medium">
-                                Total Views
-                              </span>
-                              <span className="font-bold">12,543</span>
-                            </div>
-                            <div className="w-full bg-secondary h-2 rounded-full overflow-hidden">
-                              <div
-                                className="bg-primary h-full rounded-full"
-                                style={{ width: "65%" }}
-                              ></div>
+                              <div className="space-y-2">
+                                <Label htmlFor="with-value">
+                                  Input with Value
+                                </Label>
+                                <Input
+                                  id="with-value"
+                                  value="This is a value"
+                                />
+                              </div>
                             </div>
 
-                            <div className="flex justify-between items-center">
-                              <span className="text-sm font-medium">
-                                Conversion Rate
-                              </span>
-                              <span className="font-bold">3.2%</span>
-                            </div>
-                            <div className="w-full bg-secondary h-2 rounded-full overflow-hidden">
-                              <div
-                                className="bg-primary h-full rounded-full"
-                                style={{ width: "32%" }}
-                              ></div>
-                            </div>
+                            <div className="space-y-6">
+                              <div className="space-y-4">
+                                <Label>Checkbox</Label>
+                                <div className="flex items-center space-x-2">
+                                  <Checkbox id="terms" />
+                                  <label
+                                    htmlFor="terms"
+                                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                  >
+                                    Accept terms and conditions
+                                  </label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                  <Checkbox id="terms-disabled" disabled />
+                                  <label
+                                    htmlFor="terms-disabled"
+                                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                  >
+                                    Disabled checkbox
+                                  </label>
+                                </div>
+                              </div>
 
-                            <div className="flex justify-between items-center">
-                              <span className="text-sm font-medium">
-                                Active Users
-                              </span>
-                              <span className="font-bold">1,832</span>
-                            </div>
-                            <div className="w-full bg-secondary h-2 rounded-full overflow-hidden">
-                              <div
-                                className="bg-primary h-full rounded-full"
-                                style={{ width: "48%" }}
-                              ></div>
+                              <div className="space-y-4">
+                                <Label>Radio Group</Label>
+                                <RadioGroup defaultValue="option-one">
+                                  <div className="flex items-center space-x-2">
+                                    <RadioGroupItem
+                                      value="option-one"
+                                      id="option-one"
+                                    />
+                                    <Label htmlFor="option-one">
+                                      Option One
+                                    </Label>
+                                  </div>
+                                  <div className="flex items-center space-x-2">
+                                    <RadioGroupItem
+                                      value="option-two"
+                                      id="option-two"
+                                    />
+                                    <Label htmlFor="option-two">
+                                      Option Two
+                                    </Label>
+                                  </div>
+                                  <div className="flex items-center space-x-2">
+                                    <RadioGroupItem
+                                      value="option-three"
+                                      id="option-three"
+                                      disabled
+                                    />
+                                    <Label
+                                      htmlFor="option-three"
+                                      className="opacity-70"
+                                    >
+                                      Disabled Option
+                                    </Label>
+                                  </div>
+                                </RadioGroup>
+                              </div>
+
+                              <div className="space-y-4">
+                                <Label>Switch</Label>
+                                <div className="flex items-center space-x-2">
+                                  <Switch id="airplane-mode" />
+                                  <Label htmlFor="airplane-mode">
+                                    Airplane Mode
+                                  </Label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                  <Switch id="disabled-switch" disabled />
+                                  <Label
+                                    htmlFor="disabled-switch"
+                                    className="opacity-70"
+                                  >
+                                    Disabled Switch
+                                  </Label>
+                                </div>
+                              </div>
                             </div>
                           </div>
-                        </CardContent>
-                        <CardFooter className="flex justify-between">
-                          <Button variant="outline">Export Data</Button>
-                          <Button
-                            onClick={() => setPlaceholderDialogOpen(true)}
-                          >
-                            View Details
-                          </Button>
-                        </CardFooter>
-                      </Card>
-                    </section>
-                  </TabsContent>
+                        </section>
 
-                  <TabsContent value="feedback" className="space-y-8">
-                    <section>
-                      <h2 className="text-2xl font-semibold mb-4">Alerts</h2>
-                      <div className="space-y-4">
-                        <Alert>
-                          <AlertTitle>Default Alert</AlertTitle>
-                          <AlertDescription>
-                            This is a default alert component.
-                          </AlertDescription>
-                        </Alert>
-
-                        <Alert variant="destructive">
-                          <AlertTitle>Destructive Alert</AlertTitle>
-                          <AlertDescription>
-                            This is a destructive alert component.
-                          </AlertDescription>
-                        </Alert>
-                      </div>
-                    </section>
-
-                    <section>
-                      <h2 className="text-2xl font-semibold mb-4">Dialog</h2>
-                      <div>
-                        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-                          <DialogTrigger asChild>
-                            <Button>Open Dialog</Button>
-                          </DialogTrigger>
-                          <DialogContent>
-                            <DialogHeader>
-                              <DialogTitle>Dialog Title</DialogTitle>
-                              <DialogDescription>
-                                This is a dialog component. It appears in a
-                                modal overlay.
-                              </DialogDescription>
-                            </DialogHeader>
-                            <div className="py-4">
-                              <p>
-                                Dialog content goes here. This shows how the
-                                colors work in a dialog context.
-                              </p>
+                        <section>
+                          <h2 className="text-2xl font-semibold mb-4">
+                            Select & Slider
+                          </h2>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div className="space-y-4">
+                              <Label>Select</Label>
+                              <Select>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select an option" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="option1">
+                                    Option 1
+                                  </SelectItem>
+                                  <SelectItem value="option2">
+                                    Option 2
+                                  </SelectItem>
+                                  <SelectItem value="option3">
+                                    Option 3
+                                  </SelectItem>
+                                </SelectContent>
+                              </Select>
                             </div>
-                            <DialogFooter>
+
+                            <div className="space-y-4">
+                              <Label>Slider</Label>
+                              <Slider defaultValue={[50]} max={100} step={1} />
+                            </div>
+                          </div>
+                        </section>
+                      </TabsContent>
+
+                      <TabsContent value="cards" className="space-y-8">
+                        <section>
+                          <h2 className="text-2xl font-semibold mb-4">Cards</h2>
+                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <Card>
+                              <CardHeader>
+                                <CardTitle>Default Card</CardTitle>
+                                <CardDescription>
+                                  This is a default card component
+                                </CardDescription>
+                              </CardHeader>
+                              <CardContent>
+                                <p>
+                                  Card content goes here. This shows the default
+                                  styling of the card component.
+                                </p>
+                              </CardContent>
+                              <CardFooter className="flex justify-between">
+                                <Button variant="outline">Cancel</Button>
+                                <Button>Submit</Button>
+                              </CardFooter>
+                            </Card>
+
+                            <Card className="border-primary">
+                              <CardHeader className="bg-primary/5">
+                                <CardTitle>Primary Accent</CardTitle>
+                                <CardDescription>
+                                  Card with primary color accent
+                                </CardDescription>
+                              </CardHeader>
+                              <CardContent>
+                                <p>
+                                  This card has a primary color border and
+                                  header background.
+                                </p>
+                              </CardContent>
+                              <CardFooter className="flex justify-between">
+                                <Button variant="outline">Cancel</Button>
+                                <Button>Submit</Button>
+                              </CardFooter>
+                            </Card>
+
+                            <Card className="border-destructive">
+                              <CardHeader className="bg-destructive/5">
+                                <CardTitle>Destructive Accent</CardTitle>
+                                <CardDescription>
+                                  Card with destructive color accent
+                                </CardDescription>
+                              </CardHeader>
+                              <CardContent>
+                                <p>
+                                  This card has a destructive color border and
+                                  header background.
+                                </p>
+                              </CardContent>
+                              <CardFooter className="flex justify-between">
+                                <Button variant="outline">Cancel</Button>
+                                <Button variant="destructive">Delete</Button>
+                              </CardFooter>
+                            </Card>
+                          </div>
+                        </section>
+
+                        <section className="mt-8">
+                          <h2 className="text-2xl font-semibold mb-4">
+                            Card with Placeholder Data
+                          </h2>
+                          <Card className="max-w-md">
+                            <CardHeader>
+                              <CardTitle>Project Statistics</CardTitle>
+                              <CardDescription>
+                                Overview of your project metrics for the last 30
+                                days
+                              </CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                              <div className="space-y-4">
+                                <div className="flex justify-between items-center">
+                                  <span className="text-sm font-medium">
+                                    Total Views
+                                  </span>
+                                  <span className="font-bold">12,543</span>
+                                </div>
+                                <div className="w-full bg-secondary h-2 rounded-full overflow-hidden">
+                                  <div
+                                    className="bg-primary h-full rounded-full"
+                                    style={{ width: "65%" }}
+                                  ></div>
+                                </div>
+
+                                <div className="flex justify-between items-center">
+                                  <span className="text-sm font-medium">
+                                    Conversion Rate
+                                  </span>
+                                  <span className="font-bold">3.2%</span>
+                                </div>
+                                <div className="w-full bg-secondary h-2 rounded-full overflow-hidden">
+                                  <div
+                                    className="bg-primary h-full rounded-full"
+                                    style={{ width: "32%" }}
+                                  ></div>
+                                </div>
+
+                                <div className="flex justify-between items-center">
+                                  <span className="text-sm font-medium">
+                                    Active Users
+                                  </span>
+                                  <span className="font-bold">1,832</span>
+                                </div>
+                                <div className="w-full bg-secondary h-2 rounded-full overflow-hidden">
+                                  <div
+                                    className="bg-primary h-full rounded-full"
+                                    style={{ width: "48%" }}
+                                  ></div>
+                                </div>
+                              </div>
+                            </CardContent>
+                            <CardFooter className="flex justify-between">
+                              <Button variant="outline">Export Data</Button>
                               <Button
-                                variant="outline"
-                                onClick={() => setDialogOpen(false)}
+                                onClick={() => setPlaceholderDialogOpen(true)}
                               >
-                                Cancel
+                                View Details
                               </Button>
-                              <Button onClick={() => setDialogOpen(false)}>
-                                Continue
-                              </Button>
-                            </DialogFooter>
-                          </DialogContent>
-                        </Dialog>
-                      </div>
-                    </section>
-                  </TabsContent>
+                            </CardFooter>
+                          </Card>
+                        </section>
+                      </TabsContent>
 
-                  <TabsContent value="charts" className="space-y-8">
-                    <section>
-                      <h2 className="text-2xl font-semibold mb-4">Bar Chart</h2>
-                      <Card>
-                        <CardHeader>
-                          <CardTitle>Monthly Revenue</CardTitle>
-                          <CardDescription>
-                            Revenue breakdown by month
-                          </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                          <BarChartDemo />
-                        </CardContent>
-                      </Card>
-                    </section>
+                      <TabsContent value="feedback" className="space-y-8">
+                        <section>
+                          <h2 className="text-2xl font-semibold mb-4">
+                            Alerts
+                          </h2>
+                          <div className="space-y-4">
+                            <Alert>
+                              <AlertTitle>Default Alert</AlertTitle>
+                              <AlertDescription>
+                                This is a default alert component.
+                              </AlertDescription>
+                            </Alert>
 
-                    <section>
-                      <h2 className="text-2xl font-semibold mb-4">
-                        Line Chart
-                      </h2>
-                      <Card>
-                        <CardHeader>
-                          <CardTitle>Website Analytics</CardTitle>
-                          <CardDescription>
-                            Traffic and conversion metrics
-                          </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                          <LineChartDemo />
-                        </CardContent>
-                      </Card>
-                    </section>
+                            <Alert variant="destructive">
+                              <AlertTitle>Destructive Alert</AlertTitle>
+                              <AlertDescription>
+                                This is a destructive alert component.
+                              </AlertDescription>
+                            </Alert>
+                          </div>
+                        </section>
 
-                    <section>
-                      <h2 className="text-2xl font-semibold mb-4">Pie Chart</h2>
-                      <Card>
-                        <CardHeader>
-                          <CardTitle>Device Distribution</CardTitle>
-                          <CardDescription>
-                            User device breakdown
-                          </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                          <PieChartDemo />
-                        </CardContent>
-                      </Card>
-                    </section>
-                  </TabsContent>
-
-                  <TabsContent value="navigation" className="space-y-8">
-                    <section>
-                      <h2 className="text-2xl font-semibold mb-4">
-                        Pagination
-                      </h2>
-                      <Card>
-                        <CardHeader>
-                          <CardTitle>Pagination Examples</CardTitle>
-                          <CardDescription>
-                            Different pagination styles and states
-                          </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                          <DemoPagination />
-                        </CardContent>
-                      </Card>
-                    </section>
-                  </TabsContent>
-
-                  <TabsContent value="misc" className="space-y-8">
-                    <section>
-                      <h2 className="text-2xl font-semibold mb-4">Badges</h2>
-                      <div className="flex flex-wrap gap-4">
-                        <Badge>Default</Badge>
-                        <Badge variant="secondary">Secondary</Badge>
-                        <Badge variant="destructive">Destructive</Badge>
-                        <Badge variant="outline">Outline</Badge>
-                      </div>
-                    </section>
-
-                    <section>
-                      <h2 className="text-2xl font-semibold mb-4">
-                        Dropdown Menu (Open by Default)
-                      </h2>
-                      <div className="relative">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              variant="outline"
-                              className="w-[200px] justify-between"
+                        <section>
+                          <h2 className="text-2xl font-semibold mb-4">
+                            Dialog
+                          </h2>
+                          <div>
+                            <Dialog
+                              open={dialogOpen}
+                              onOpenChange={setDialogOpen}
                             >
-                              Open Menu
-                              <ChevronDown className="ml-2 h-4 w-4" />
-                              <span className="sr-only">Toggle menu</span>
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent className="w-[200px]">
-                            <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem>Profile</DropdownMenuItem>
-                            <DropdownMenuItem>Billing</DropdownMenuItem>
-                            <DropdownMenuItem>Team</DropdownMenuItem>
-                            <DropdownMenuItem>Subscription</DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </div>
-                    </section>
+                              <DialogTrigger asChild>
+                                <Button>Open Dialog</Button>
+                              </DialogTrigger>
+                              <DialogContent>
+                                <DialogHeader>
+                                  <DialogTitle>Dialog Title</DialogTitle>
+                                  <DialogDescription>
+                                    This is a dialog component. It appears in a
+                                    modal overlay.
+                                  </DialogDescription>
+                                </DialogHeader>
+                                <div className="py-4">
+                                  <p>
+                                    Dialog content goes here. This shows how the
+                                    colors work in a dialog context.
+                                  </p>
+                                </div>
+                                <DialogFooter>
+                                  <Button
+                                    variant="outline"
+                                    onClick={() => setDialogOpen(false)}
+                                  >
+                                    Cancel
+                                  </Button>
+                                  <Button onClick={() => setDialogOpen(false)}>
+                                    Continue
+                                  </Button>
+                                </DialogFooter>
+                              </DialogContent>
+                            </Dialog>
+                          </div>
+                        </section>
+                      </TabsContent>
 
-                    <section>
-                      <h2 className="text-2xl font-semibold mb-4">Tooltip</h2>
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button variant="outline">Hover Me</Button>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>This is a tooltip</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    </section>
+                      <TabsContent value="charts" className="space-y-8">
+                        <section>
+                          <h2 className="text-2xl font-semibold mb-4">
+                            Bar Chart
+                          </h2>
+                          <Card>
+                            <CardHeader>
+                              <CardTitle>Monthly Revenue</CardTitle>
+                              <CardDescription>
+                                Revenue breakdown by month
+                              </CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                              <BarChartDemo />
+                            </CardContent>
+                          </Card>
+                        </section>
 
-                    <section>
-                      <h2 className="text-2xl font-semibold mb-4">Separator</h2>
-                      <div className="space-y-4">
-                        <div>Above separator</div>
-                        <Separator />
-                        <div>Below separator</div>
-                      </div>
-                    </section>
-                  </TabsContent>
-                </Tabs>
+                        <section>
+                          <h2 className="text-2xl font-semibold mb-4">
+                            Line Chart
+                          </h2>
+                          <Card>
+                            <CardHeader>
+                              <CardTitle>Website Analytics</CardTitle>
+                              <CardDescription>
+                                Traffic and conversion metrics
+                              </CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                              <LineChartDemo />
+                            </CardContent>
+                          </Card>
+                        </section>
+
+                        <section>
+                          <h2 className="text-2xl font-semibold mb-4">
+                            Pie Chart
+                          </h2>
+                          <Card>
+                            <CardHeader>
+                              <CardTitle>Device Distribution</CardTitle>
+                              <CardDescription>
+                                User device breakdown
+                              </CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                              <PieChartDemo />
+                            </CardContent>
+                          </Card>
+                        </section>
+                      </TabsContent>
+
+                      <TabsContent value="navigation" className="space-y-8">
+                        <section>
+                          <h2 className="text-2xl font-semibold mb-4">
+                            Pagination
+                          </h2>
+                          <Card>
+                            <CardHeader>
+                              <CardTitle>Pagination Examples</CardTitle>
+                              <CardDescription>
+                                Different pagination styles and states
+                              </CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                              <DemoPagination />
+                            </CardContent>
+                          </Card>
+                        </section>
+                      </TabsContent>
+
+                      <TabsContent value="misc" className="space-y-8">
+                        <section>
+                          <h2 className="text-2xl font-semibold mb-4">
+                            Badges
+                          </h2>
+                          <div className="flex flex-wrap gap-4">
+                            <Badge>Default</Badge>
+                            <Badge variant="secondary">Secondary</Badge>
+                            <Badge variant="destructive">Destructive</Badge>
+                            <Badge variant="outline">Outline</Badge>
+                          </div>
+                        </section>
+
+                        <section>
+                          <h2 className="text-2xl font-semibold mb-4">
+                            Dropdown Menu (Open by Default)
+                          </h2>
+                          <div className="relative">
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button
+                                  variant="outline"
+                                  className="w-[200px] justify-between"
+                                >
+                                  Open Menu
+                                  <ChevronDown className="ml-2 h-4 w-4" />
+                                  <span className="sr-only">Toggle menu</span>
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent className="w-[200px]">
+                                <DropdownMenuLabel>
+                                  My Account
+                                </DropdownMenuLabel>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem>Profile</DropdownMenuItem>
+                                <DropdownMenuItem>Billing</DropdownMenuItem>
+                                <DropdownMenuItem>Team</DropdownMenuItem>
+                                <DropdownMenuItem>
+                                  Subscription
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
+                        </section>
+
+                        <section>
+                          <h2 className="text-2xl font-semibold mb-4">
+                            Tooltip
+                          </h2>
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button variant="outline">Hover Me</Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>This is a tooltip</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        </section>
+
+                        <section>
+                          <h2 className="text-2xl font-semibold mb-4">
+                            Separator
+                          </h2>
+                          <div className="space-y-4">
+                            <div>Above separator</div>
+                            <Separator />
+                            <div>Below separator</div>
+                          </div>
+                        </section>
+                      </TabsContent>
+                    </Tabs>
+                  </CardContent>
+                </Card>
               </div>
             </div>
           </SidebarProvider>
