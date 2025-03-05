@@ -367,7 +367,7 @@ export function PaletteManager() {
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="saved">
-          <TabsList className="grid grid-cols-2 mb-4">
+          <TabsList className="flex w-fit">
             <TabsTrigger value="saved">Saved Palettes</TabsTrigger>
             <TabsTrigger value="import-export">Import/Export</TabsTrigger>
           </TabsList>

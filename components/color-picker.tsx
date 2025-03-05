@@ -402,7 +402,7 @@ export function ThemeCustomizer({
         <Separator className="my-6" />
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid grid-cols-2 mb-4">
+          <TabsList className="flex w-fit">
             <TabsTrigger value="light">Light Mode</TabsTrigger>
             <TabsTrigger value="dark">Dark Mode</TabsTrigger>
           </TabsList>

@@ -185,11 +185,13 @@ export default function ThemeShowcase() {
 
               <div className="container mx-auto px-0 max-w-[1200px]">
                 <Tabs defaultValue="generator" className="w-full mb-8">
-                  <TabsList>
-                    <TabsTrigger value="generator">Palette Generator</TabsTrigger>
-                    <TabsTrigger value="customizer">Theme Customizer</TabsTrigger>
-                    <TabsTrigger value="manager">Palette Manager</TabsTrigger>
-                  </TabsList>
+                  <div className="overflow-x-auto pb-2 mb-2">
+                    <TabsList className="flex w-fit">
+                      <TabsTrigger value="generator">Palette Generator</TabsTrigger>
+                      <TabsTrigger value="customizer">Theme Customizer</TabsTrigger>
+                      <TabsTrigger value="manager">Palette Manager</TabsTrigger>
+                    </TabsList>
+                  </div>
                   <TabsContent value="customizer">
                     <ThemeCustomizer
                       isDarkMode={isDarkMode}
@@ -219,15 +221,17 @@ export default function ThemeShowcase() {
                 </Tabs>
 
                 <Tabs defaultValue="buttons" className="w-full">
-                  <TabsList className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 mb-8">
-                    <TabsTrigger value="buttons">Buttons</TabsTrigger>
-                    <TabsTrigger value="inputs">Inputs</TabsTrigger>
-                    <TabsTrigger value="cards">Cards</TabsTrigger>
-                    <TabsTrigger value="feedback">Feedback</TabsTrigger>
-                    <TabsTrigger value="charts">Charts</TabsTrigger>
-                    <TabsTrigger value="navigation">Navigation</TabsTrigger>
-                    <TabsTrigger value="misc">Misc</TabsTrigger>
-                  </TabsList>
+                  <div className="overflow-x-auto pb-2 mb-6">
+                    <TabsList className="flex w-fit items-center justify-start">
+                      <TabsTrigger value="buttons">Buttons</TabsTrigger>
+                      <TabsTrigger value="inputs">Inputs</TabsTrigger>
+                      <TabsTrigger value="cards">Cards</TabsTrigger>
+                      <TabsTrigger value="feedback">Feedback</TabsTrigger>
+                      <TabsTrigger value="charts">Charts</TabsTrigger>
+                      <TabsTrigger value="navigation">Navigation</TabsTrigger>
+                      <TabsTrigger value="misc">Misc</TabsTrigger>
+                    </TabsList>
+                  </div>
 
                   <TabsContent value="buttons" className="space-y-8">
                     <section>
