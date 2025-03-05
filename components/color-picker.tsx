@@ -104,19 +104,17 @@ export function ColorPicker({ label, colorKey, defaultValue, onChange, isDarkMod
           <div className="flex items-center gap-2">
             <span className="text-xs w-6 md:w-8">Hue</span>
             <div className="relative flex-1">
-              <div
-                className="absolute inset-0 rounded-full -z-10"
-                style={{
-                  background:
-                    "linear-gradient(to right, #f00 0%, #ff0 17%, #0f0 33%, #0ff 50%, #00f 67%, #f0f 83%, #f00 100%)",
-                }}
-              />
               <Slider
                 value={[hue]}
                 min={0}
                 max={360}
                 step={1}
                 className="flex-1"
+                trackStyle={{
+                  background:
+                    "linear-gradient(to right, #f00 0%, #ff0 17%, #0f0 33%, #0ff 50%, #00f 67%, #f0f 83%, #f00 100%)",
+                }}
+                rangeClassName="bg-transparent"
                 onValueChange={(value) => {
                   setHue(value[0])
                   updateColor(value[0], saturation, lightness)
@@ -128,18 +126,16 @@ export function ColorPicker({ label, colorKey, defaultValue, onChange, isDarkMod
           <div className="flex items-center gap-2">
             <span className="text-xs w-6 md:w-8">Sat</span>
             <div className="relative flex-1">
-              <div
-                className="absolute inset-0 rounded-full -z-10"
-                style={{
-                  background: `linear-gradient(to right, hsl(${hue}, 0%, ${lightness}%), hsl(${hue}, 100%, ${lightness}%))`,
-                }}
-              />
               <Slider
                 value={[saturation]}
                 min={0}
                 max={100}
                 step={1}
                 className="flex-1"
+                trackStyle={{
+                  background: `linear-gradient(to right, hsl(${hue}, 0%, ${lightness}%), hsl(${hue}, 100%, ${lightness}%))`,
+                }}
+                rangeClassName="bg-transparent"
                 onValueChange={(value) => {
                   setSaturation(value[0])
                   updateColor(hue, value[0], lightness)
@@ -151,18 +147,16 @@ export function ColorPicker({ label, colorKey, defaultValue, onChange, isDarkMod
           <div className="flex items-center gap-2">
             <span className="text-xs w-6 md:w-8">Light</span>
             <div className="relative flex-1">
-              <div
-                className="absolute inset-0 rounded-full -z-10"
-                style={{
-                  background: `linear-gradient(to right, hsl(${hue}, ${saturation}%, 0%), hsl(${hue}, ${saturation}%, 50%), hsl(${hue}, ${saturation}%, 100%))`,
-                }}
-              />
               <Slider
                 value={[lightness]}
                 min={0}
                 max={100}
                 step={1}
                 className="flex-1"
+                trackStyle={{
+                  background: `linear-gradient(to right, hsl(${hue}, ${saturation}%, 0%), hsl(${hue}, ${saturation}%, 50%), hsl(${hue}, ${saturation}%, 100%))`,
+                }}
+                rangeClassName="bg-transparent"
                 onValueChange={(value) => {
                   setLightness(value[0])
                   updateColor(hue, saturation, value[0])
