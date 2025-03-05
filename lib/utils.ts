@@ -200,8 +200,8 @@ export function generateDuotoneColorPalette(primaryHex: string, secondaryHex: st
     "chart-3": `${(primaryH + 180) % 360} 85% 60%`,
     "chart-4": `${(secondaryH + 180) % 360} 75% 65%`,
     "chart-5": `${(primaryH + secondaryH) / 2} 85% 60%`,
-    "gradient-one": `${primaryH} 100% 60%`,
-    "gradient-two": `${secondaryH} 80% 60%`,
+    "gradient-one": `${primaryH} ${Math.min(100, primaryS + 10)}% 80%`,
+    "gradient-two": `${secondaryH} ${Math.min(100, secondaryS + 10)}% 70%`,
   }
 
   return {
