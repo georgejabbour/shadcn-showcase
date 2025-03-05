@@ -2,7 +2,8 @@
 
 A powerful tool for generating, customizing, and previewing shadcn/ui component themes. This application allows you to create beautiful color palettes for your shadcn/ui projects with an intuitive interface.
 
-![Shadcn UI Showcase](https://github.com/yourusername/shadcn-showcase/assets/yourusername/shadcn-showcase.png)
+![Shadcn UI Showcase](https://github.com/user-attachments/assets/89a5df44-c631-4d0c-b978-731ea81a0c07)
+
 
 ## Table of Contents
 
@@ -93,6 +94,8 @@ pnpm lint
 
 ### Color Palette Generator
 
+![Color Palette Generator](https://github.com/user-attachments/assets/c9c3df52-7b11-4978-8636-7f902df36043)
+
 The Color Palette Generator allows you to create complete shadcn/ui color palettes from a single primary color or a duotone combination.
 
 1. Choose between Single Color or Duotone mode
@@ -102,6 +105,8 @@ The Color Palette Generator allows you to create complete shadcn/ui color palett
 
 ### Theme Customizer
 
+![Theme Customizer](https://github.com/user-attachments/assets/7e7074bf-c2d1-4aa5-ac9d-2b91bab9cefe)
+
 The Theme Customizer provides fine-grained control over individual color values:
 
 1. Use the color pickers to adjust specific colors in your theme
@@ -109,6 +114,11 @@ The Theme Customizer provides fine-grained control over individual color values:
 3. See changes reflected in real-time across all components
 
 ### Palette Management
+
+![Palette Management 1](https://github.com/user-attachments/assets/7ab943c3-a197-4977-ad82-fa7515eff0d0)
+
+![Palette Management 2](https://github.com/user-attachments/assets/2092929e-d889-49d6-b8c2-dd53178321c1)
+
 
 The Palette Manager allows you to save and reuse your favorite themes:
 
@@ -118,6 +128,8 @@ The Palette Manager allows you to save and reuse your favorite themes:
 4. **Import Palettes**: Upload JSON palettes created by you or others
 
 ### Component Showcase
+
+![Component Showcase](https://github.com/user-attachments/assets/c53c9228-9a3c-49b2-a4f0-4b3eb01c6d4a)
 
 The Component Showcase displays sample shadcn/ui components with your custom theme:
 
