@@ -3,6 +3,8 @@ import { persist } from 'zustand/middleware';
 import { getDefaultColors } from './theme-config';
 import { savePalette as dbSavePalette, getPalettes, deletePalette as dbDeletePalette, getPalette, Palette } from './db';
 import { StateCreator } from 'zustand/vanilla';
+import { useConfirmDialog } from './confirm-dialog-store';
+import { useSavePaletteDialog } from '@/components/save-palette-dialog';
 
 interface PaletteState {
   // Current theme state
@@ -19,7 +21,7 @@ interface PaletteState {
   setLightColors: (colors: Record<string, string>) => void;
   setDarkColors: (colors: Record<string, string>) => void;
   setBorderRadius: (radius: number) => void;
-  resetTheme: () => void;
+  resetTheme: () => Promise<void>;
   
   // Palette management
   savePalette: (name: string) => Promise<number>;
@@ -52,44 +54,71 @@ export const usePaletteStore = create<PaletteState>()(
       setBorderRadius: (radius: number) => set({ borderRadius: radius }),
       
       resetTheme: () => {
-        set({
-          lightColors: getDefaultColors('light'),
-          darkColors: getDefaultColors('dark'),
-          borderRadius: 0.5
+        // Use the confirm dialog
+        return new Promise<void>((resolve) => {
+          useConfirmDialog.getState().open({
+            title: 'Reset Theme',
+            description: 'Are you sure you want to reset the theme to default settings? This action cannot be undone.',
+            confirmText: 'Reset',
+            onConfirm: () => {
+              set({
+                lightColors: getDefaultColors('light'),
+                darkColors: getDefaultColors('dark'),
+                borderRadius: 0.5
+              });
+              
+              // Apply to CSS variables
+              const root = document.documentElement;
+              root.style.cssText = "";
+              root.style.setProperty("--radius", `0.5rem`);
+              
+              // Remove the dark mode style element if it exists
+              const styleEl = document.getElementById("theme-dark-colors");
+              if (styleEl) {
+                styleEl.remove();
+              }
+              resolve();
+            },
+            onCancel: () => {
+              resolve();
+            }
+          });
         });
-        
-        // Apply to CSS variables
-        const root = document.documentElement;
-        root.style.cssText = "";
-        root.style.setProperty("--radius", `0.5rem`);
-        
-        // Remove the dark mode style element if it exists
-        const styleEl = document.getElementById("theme-dark-colors");
-        if (styleEl) {
-          styleEl.remove();
-        }
       },
       
       // Palette management
       savePalette: async (name: string) => {
         const { lightColors, darkColors, borderRadius } = get();
         
-        // Log the values being saved for debugging
-        console.log("Store - Saving palette:", name);
-        console.log("Store - Light colors:", lightColors);
-        console.log("Store - Dark colors:", darkColors);
-        console.log("Store - Border radius:", borderRadius);
-        
-        const id = await dbSavePalette({
-          name,
-          lightColors,
-          darkColors,
-          borderRadius
+        // Use the save palette dialog with duo-tone option
+        return new Promise<number>((resolve) => {
+          useSavePaletteDialog.getState().open({
+            paletteName: name,
+            onConfirm: async (isDuoTone) => {
+              // Log the values being saved for debugging
+              console.log("Store - Saving palette:", name);
+              console.log("Store - Light colors:", lightColors);
+              console.log("Store - Dark colors:", darkColors);
+              console.log("Store - Border radius:", borderRadius);
+              console.log("Store - Is duo-tone:", isDuoTone);
+              
+              const id = await dbSavePalette({
+                name,
+                lightColors,
+                darkColors,
+                borderRadius,
+                isDuoTone
+              });
+              
+              // Refresh the list of saved palettes
+              await get().loadSavedPalettes();
+              resolve(id);
+            },
+            onCancel: () => {
+              resolve(-1); // Return -1 to indicate cancellation
+            }
+          });
         });
-        
-        // Refresh the list of saved palettes
-        await get().loadSavedPalettes();
-        return id;
       },
       
       loadPalette: async (id: number) => {
@@ -186,8 +215,26 @@ export const usePaletteStore = create<PaletteState>()(
       },
       
       deletePalette: async (id: number) => {
-        await dbDeletePalette(id);
-        await get().loadSavedPalettes();
+        // Find the palette name for the confirmation message
+        const palette = get().savedPalettes.find(p => p.id === id);
+        const paletteName = palette ? palette.name : 'this palette';
+        
+        // Use the confirm dialog
+        return new Promise<void>((resolve) => {
+          useConfirmDialog.getState().open({
+            title: 'Delete Palette',
+            description: `Are you sure you want to delete "${paletteName}"?`,
+            confirmText: 'Delete',
+            onConfirm: async () => {
+              await dbDeletePalette(id);
+              await get().loadSavedPalettes();
+              resolve();
+            },
+            onCancel: () => {
+              resolve();
+            }
+          });
+        });
       }
     })) as PaletteStateCreator,
     {

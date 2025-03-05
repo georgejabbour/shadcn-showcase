@@ -39,7 +39,12 @@ import {
 import { useToast } from "@/components/ui/use-toast";
 import { Textarea } from "@/components/ui/textarea";
 import { hslToHex } from "@/lib/utils";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 // Debug utility function
 const debugPalette = (palette: Palette) => {
@@ -110,7 +115,13 @@ export function PaletteManager() {
       console.log("Current dark colors:", currentState.darkColors);
       console.log("Current border radius:", currentState.borderRadius);
 
-      await savePalette(paletteName.trim());
+      const id = await savePalette(paletteName.trim());
+
+      // If id is -1, the user cancelled the confirmation
+      if (id === -1) {
+        return;
+      }
+
       setPaletteName("");
       setSaveDialogOpen(false);
 
@@ -121,9 +132,8 @@ export function PaletteManager() {
     } catch (error) {
       console.error("Error saving palette:", error);
       toast({
-        title: "Error saving palette",
-        description:
-          "There was an error saving your palette. Please try again.",
+        title: "Error",
+        description: "There was an error saving your palette.",
         variant: "destructive",
       });
     }
@@ -518,7 +528,11 @@ export function PaletteManager() {
                           </div>
                           <div className="flex gap-2">
                             {Object.entries(palette.lightColors)
-                              .filter(([key]) => key === "--primary")
+                              .filter(
+                                ([key]) =>
+                                  key === "--primary" ||
+                                  (key === "--secondary" && palette.isDuoTone)
+                              )
                               .map(([key, value]) => {
                                 // Parse HSL values correctly
                                 const hslParts = value.split(" ");
@@ -529,7 +543,7 @@ export function PaletteManager() {
                                 const l = parseFloat(
                                   hslParts[2].replace("%", "")
                                 );
-                                
+
                                 const hexValue = `#${hslToHex(h, s, l)}`;
                                 const hslValue = value;
                                 const colorName = key.replace("--", "");
@@ -540,12 +554,20 @@ export function PaletteManager() {
                                     className="text-xs flex flex-col gap-1"
                                     title={colorName}
                                   >
+                                    <span className="text-xs text-muted-foreground">
+                                      {key}
+                                    </span>
                                     <TooltipProvider>
                                       <Tooltip>
                                         <TooltipTrigger asChild>
-                                          <span 
+                                          <span
                                             className="font-medium cursor-pointer hover:text-primary transition-colors duration-200 hover:underline"
-                                            onClick={() => copyToClipboard(hexValue, `Hex color (${colorName})`)}
+                                            onClick={() =>
+                                              copyToClipboard(
+                                                hexValue,
+                                                `Hex color (${colorName})`
+                                              )
+                                            }
                                           >
                                             {hexValue}
                                           </span>
@@ -555,13 +577,18 @@ export function PaletteManager() {
                                         </TooltipContent>
                                       </Tooltip>
                                     </TooltipProvider>
-                                    
+
                                     <TooltipProvider>
                                       <Tooltip>
                                         <TooltipTrigger asChild>
-                                          <span 
+                                          <span
                                             className="text-muted-foreground ml-1 cursor-pointer hover:text-muted-foreground/80 transition-colors duration-200 hover:underline"
-                                            onClick={() => copyToClipboard(`hsl(${hslValue})`, `HSL color (${colorName})`)}
+                                            onClick={() =>
+                                              copyToClipboard(
+                                                `hsl(${hslValue})`,
+                                                `HSL color (${colorName})`
+                                              )
+                                            }
                                           >
                                             (hsl: {value})
                                           </span>

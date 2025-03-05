@@ -153,8 +153,8 @@ export default function ThemeShowcase() {
   }
 
   // Use the store's reset function
-  const resetTheme = () => {
-    storeResetTheme();
+  const resetTheme = async () => {
+    await storeResetTheme();
   }
 
   useEffect(() => {

@@ -8,6 +8,7 @@ export interface Palette {
   lightColors: Record<string, any>;
   darkColors: Record<string, any>;
   borderRadius: number;
+  isDuoTone?: boolean;
 }
 
 // Create a Dexie database class
@@ -16,8 +17,23 @@ class PaletteDatabase extends Dexie {
 
   constructor() {
     super('paletteDatabase');
-    this.version(1).stores({
-      palettes: '++id, name, createdAt'
+    this.version(2).stores({
+      palettes: '++id, name, createdAt, isDuoTone'
+    });
+    
+    // Migration from v1 to v2: Add isDuoTone field to existing records
+    this.on('ready', () => {
+      // Upgrade needed
+      if (this.verno === 2) {
+        this.transaction('rw', this.palettes, async () => {
+          const allPalettes = await this.palettes.toArray();
+          allPalettes.forEach(async (palette) => {
+            if (palette.isDuoTone === undefined) {
+              await this.palettes.update(palette.id!, { isDuoTone: false });
+            }
+          });
+        }).catch(e => console.error('Migration failed:', e));
+      }
     });
   }
 }
@@ -26,10 +42,11 @@ class PaletteDatabase extends Dexie {
 export const db = new PaletteDatabase();
 
 // Helper functions for palette operations
-export async function savePalette(palette: Omit<Palette, 'id' | 'createdAt'>): Promise<number> {
+export async function savePalette(palette: Omit<Palette, 'id' | 'createdAt' | 'isDuoTone'> & { isDuoTone?: boolean }): Promise<number> {
   const formattedPalette = {
     ...palette,
-    createdAt: new Date()
+    createdAt: new Date(),
+    isDuoTone: palette.isDuoTone ?? false
   };
   
   return await db.palettes.add(formattedPalette);
