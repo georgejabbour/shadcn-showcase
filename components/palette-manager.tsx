@@ -92,7 +92,7 @@ export function PaletteManager() {
     setShowActionsContainer,
     showActionsContainer,
     saveDialogOpen,
-    setSaveDialogOpen
+    setSaveDialogOpen,
   } = usePaletteStore();
 
   const [paletteName, setPaletteName] = useState("");
@@ -533,8 +533,19 @@ export function PaletteManager() {
       id: "delete",
       label: "Delete palette",
       icon: Trash2,
-      onClick: (palette: Palette) =>
-        handleDeletePalette(palette.id!, palette.name),
+      onClick: (palette: Palette) => {
+        // Prevent deletion of the default palette
+        if (palette.name === "Default Palette" || savedPalettes.length === 1) {
+          toast({
+            title: "Cannot Delete Default Palette",
+            description:
+              "The default palette cannot be deleted. You can modify it or create new palettes instead.",
+            variant: "destructive",
+          });
+          return;
+        }
+        handleDeletePalette(palette.id!, palette.name);
+      },
     },
   ];
 
@@ -630,35 +641,37 @@ export function PaletteManager() {
                           key={palette.id}
                           className="flex items-center justify-between p-3 border rounded-md"
                         >
-                          <div className="flex items-center space-x-3 gap-3">
-                            <div className="flex flex-col gap-1">
-                              <div className="flex space-x-2 items-center">
-                                {Object.entries(palette.lightColors)
-                                  .filter(
-                                    ([key]) =>
-                                      key === "--primary" ||
-                                      key === "--secondary" ||
-                                      key === "--accent"
-                                  )
-                                  .map(([key, value]) => (
-                                    <div
-                                      key={key}
-                                      className="w-4 h-4 rounded-full border"
-                                      style={{
-                                        backgroundColor: `hsl(${value})`,
-                                      }}
-                                      title={key.replace("--", "")}
-                                    />
-                                  ))}
+                          <div className="flex items-center w-full justify-between space-x-3 gap-3">
+                            <div className="flex items-center gap-5">
+                              <div className="flex flex-col gap-1">
+                                <div className="flex space-x-2 items-center">
+                                  {Object.entries(palette.lightColors)
+                                    .filter(
+                                      ([key]) =>
+                                        key === "--primary" ||
+                                        key === "--secondary" ||
+                                        key === "--accent"
+                                    )
+                                    .map(([key, value]) => (
+                                      <div
+                                        key={key}
+                                        className="w-4 h-4 rounded-full border"
+                                        style={{
+                                          backgroundColor: `hsl(${value})`,
+                                        }}
+                                        title={key.replace("--", "")}
+                                      />
+                                    ))}
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <p className="font-medium">{palette.name}</p>
+                                </div>
+                                <p className="text-xs text-muted-foreground">
+                                  {new Date(
+                                    palette.createdAt
+                                  ).toLocaleDateString()}
+                                </p>
                               </div>
-                              <p className="font-medium">{palette.name}</p>
-                              <p className="text-xs text-muted-foreground">
-                                {new Date(
-                                  palette.createdAt
-                                ).toLocaleDateString()}
-                              </p>
-                            </div>
-                            <div className="flex gap-2">
                               {Object.entries(palette.lightColors)
                                 .filter(
                                   ([key]) =>
@@ -731,53 +744,60 @@ export function PaletteManager() {
                                   );
                                 })}
                             </div>
-                          </div>
-                          <div className="flex space-x-2">
-                            {/* Desktop view - show buttons with tooltips */}
-                            <div className="hidden md:flex space-x-2">
-                              {paletteActions.map((action) => (
-                                <Tooltip key={action.id}>
-                                  <TooltipTrigger asChild>
-                                    <Button
-                                      variant="ghost"
-                                      size="icon"
-                                      onClick={() => action.onClick(palette)}
-                                      title={action.label}
-                                    >
-                                      <action.icon className="h-4 w-4" />
-                                    </Button>
-                                  </TooltipTrigger>
-                                  <TooltipContent>
-                                    <p>{action.label}</p>
-                                  </TooltipContent>
-                                </Tooltip>
-                              ))}
-                            </div>
-
-                            {/* Mobile view - show dropdown menu */}
-                            <div className="md:hidden">
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <Button variant="ghost" size="icon">
-                                    <MoreHorizontal className="h-4 w-4" />
-                                  </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                  <DropdownMenuLabel>
-                                    Palette Actions
-                                  </DropdownMenuLabel>
-                                  <DropdownMenuSeparator />
-                                  {paletteActions.map((action) => (
-                                    <DropdownMenuItem
-                                      key={action.id}
-                                      onClick={() => action.onClick(palette)}
-                                    >
-                                      <action.icon className="mr-2 h-4 w-4" />
-                                      {action.label}
-                                    </DropdownMenuItem>
+                            <div className="flex gap-2">
+                              {/* Desktop view - show buttons with tooltips */}
+                              <div className="hidden md:flex space-x-2">
+                                {palette.name !== "Default Palette" &&
+                                  paletteActions.map((action) => (
+                                    <Tooltip key={action.id}>
+                                      <TooltipTrigger asChild>
+                                        <Button
+                                          variant="ghost"
+                                          size="icon"
+                                          onClick={() =>
+                                            action.onClick(palette)
+                                          }
+                                          title={action.label}
+                                        >
+                                          <action.icon className="h-4 w-4" />
+                                        </Button>
+                                      </TooltipTrigger>
+                                      <TooltipContent>
+                                        <p>{action.label}</p>
+                                      </TooltipContent>
+                                    </Tooltip>
                                   ))}
-                                </DropdownMenuContent>
-                              </DropdownMenu>
+                              </div>
+
+                              {/* Mobile view - show dropdown menu */}
+                              {palette.name !== "Default Palette" && (
+                                <div className="md:hidden">
+                                  <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                      <Button variant="ghost" size="icon">
+                                        <MoreHorizontal className="h-4 w-4" />
+                                      </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end">
+                                      <DropdownMenuLabel>
+                                        Palette Actions
+                                      </DropdownMenuLabel>
+                                      <DropdownMenuSeparator />
+                                      {paletteActions.map((action) => (
+                                        <DropdownMenuItem
+                                          key={action.id}
+                                          onClick={() =>
+                                            action.onClick(palette)
+                                          }
+                                        >
+                                          <action.icon className="mr-2 h-4 w-4" />
+                                          {action.label}
+                                        </DropdownMenuItem>
+                                      ))}
+                                    </DropdownMenuContent>
+                                  </DropdownMenu>
+                                </div>
+                              )}
                             </div>
                           </div>
                         </div>

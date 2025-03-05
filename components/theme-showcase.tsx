@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Moon, Sun, ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -69,14 +69,15 @@ import { usePaletteStore, initializePaletteStore } from "@/lib/store";
 export default function ThemeShowcase() {
   const {
     isDarkMode,
+    setIsDarkMode,
     lightColors,
     darkColors,
     borderRadius,
-    setIsDarkMode,
     setLightColors,
     setDarkColors,
     setBorderRadius,
     resetTheme: storeResetTheme,
+    savedPalettes,
     loadSavedPalettes,
     showActionsContainer,
     setShowActionsContainer,
@@ -84,14 +85,18 @@ export default function ThemeShowcase() {
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [placeholderDialogOpen, setPlaceholderDialogOpen] = useState(false);
-
-  // Load saved palettes when the component mounts
+  
+  // Initialize the palette store once when the component mounts
   useEffect(() => {
+    console.log("ThemeShowcase mounted, initializing palette store...");
     // Initialize the palette database and load saved palettes
     initializePaletteStore().catch((error) => {
       console.error("Failed to initialize palette store:", error);
     });
+  }, []); // Empty dependency array ensures this only runs once
 
+  // Handle dark mode class toggling separately
+  useEffect(() => {
     // Set the dark mode class based on the store value
     if (isDarkMode) {
       document.documentElement.classList.add("dark");
