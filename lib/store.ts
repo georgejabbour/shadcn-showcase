@@ -248,7 +248,11 @@ export const usePaletteStore = create<PaletteState>()(
       name: 'palette-storage',
       partialize: (state) => ({
         isDarkMode: state.isDarkMode,
-        borderRadius: state.borderRadius
+        borderRadius: state.borderRadius,
+        lightColors: state.lightColors,
+        darkColors: state.darkColors,
+        savedPalettes: state.savedPalettes,
+        showActionsContainer: state.showActionsContainer
       })
     }
   )
