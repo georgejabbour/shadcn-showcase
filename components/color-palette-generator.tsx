@@ -491,7 +491,7 @@ export function ColorPaletteGenerator({ onApplyPalette }: ColorPaletteGeneratorP
               <TabsTrigger value="css">CSS</TabsTrigger>
             </TabsList>
             <TabsContent value="preview" className="mt-4">
-              <div className="grid gap-6 md:grid-cols-2">
+              <div className="grid gap-6 grid-cols-2">
                 <Card>
                   <CardHeader>
                     <CardTitle>Light Mode</CardTitle>

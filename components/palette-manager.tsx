@@ -36,6 +36,9 @@ import {
   FileJson,
   Copy,
   Pencil,
+  MoreHorizontal,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { Textarea } from "@/components/ui/textarea";
@@ -46,6 +49,14 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 // Debug utility function
 const debugPalette = (palette: Palette) => {
@@ -78,6 +89,8 @@ export function PaletteManager() {
     setLightColors,
     setDarkColors,
     setBorderRadius,
+    setShowActionsContainer,
+    showActionsContainer,
   } = usePaletteStore();
 
   const [paletteName, setPaletteName] = useState("");
@@ -489,370 +502,395 @@ export function PaletteManager() {
     }
   };
 
+  // Define palette actions as a constant object
+  const paletteActions = [
+    {
+      id: "load",
+      label: "Load palette",
+      icon: Check,
+      onClick: (palette: Palette) => handleLoadPalette(palette.id!),
+    },
+    {
+      id: "edit",
+      label: "Edit palette name",
+      icon: Pencil,
+      onClick: (palette: Palette) => handleEditPalette(palette),
+    },
+    {
+      id: "overwrite",
+      label: "Overwrite with current settings",
+      icon: Save,
+      onClick: (palette: Palette) => handleOverwritePalette(palette),
+    },
+    {
+      id: "export",
+      label: "Export palette",
+      icon: Download,
+      onClick: (palette: Palette) => handleExportPalette(palette),
+    },
+    {
+      id: "delete",
+      label: "Delete palette",
+      icon: Trash2,
+      onClick: (palette: Palette) =>
+        handleDeletePalette(palette.id!, palette.name),
+    },
+  ];
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Palette Manager</CardTitle>
+        <CardTitle
+          className="flex items-center justify-between group cursor-pointer"
+          onClick={() => setShowActionsContainer(!showActionsContainer)}
+        >
+          Palette Manager
+          <Button variant="ghost" size="icon" className="group-hover:bg-accent">
+            {showActionsContainer ? <ChevronUp /> : <ChevronDown />}
+          </Button>
+        </CardTitle>
         <CardDescription>
           Save, load, and manage your color palettes
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <Tabs defaultValue="saved">
-          <TabsList className="flex w-fit">
-            <TabsTrigger value="saved">Saved Palettes</TabsTrigger>
-            <TabsTrigger value="import-export">Import/Export</TabsTrigger>
-          </TabsList>
+        {showActionsContainer && (
+          <Tabs defaultValue="saved">
+            <TabsList className="flex w-fit">
+              <TabsTrigger value="saved">Saved Palettes</TabsTrigger>
+              <TabsTrigger value="import-export">Import/Export</TabsTrigger>
+            </TabsList>
 
-          <TabsContent value="saved">
-            <div className="space-y-4">
-              <div className="flex justify-between items-center">
-                <h3 className="text-lg font-medium">Your Palettes</h3>
-                <Dialog open={saveDialogOpen} onOpenChange={setSaveDialogOpen}>
-                  <DialogTrigger asChild>
-                    <Button size="sm">
-                      <Save className="h-4 w-4 mr-2" />
-                      Save Current
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>
-                        {editingPaletteId ? "Edit Palette" : "Save Palette"}
-                      </DialogTitle>
-                      <DialogDescription>
-                        {editingPaletteId
-                          ? "Edit the palette name and save your changes."
-                          : "Give your palette a name to save it to your collection."}
-                      </DialogDescription>
-                    </DialogHeader>
-                    <div className="py-4">
-                      <Label htmlFor="palette-name">Palette Name</Label>
-                      <Input
-                        id="palette-name"
-                        value={paletteName}
-                        onChange={(e) => setPaletteName(e.target.value)}
-                        placeholder="My Awesome Theme"
-                      />
-                    </div>
-                    <DialogFooter>
-                      <Button
-                        variant="outline"
-                        onClick={() => {
-                          setSaveDialogOpen(false);
-                          setEditingPaletteId(undefined);
-                          setPaletteName("");
-                        }}
-                      >
-                        Cancel
+            <TabsContent value="saved">
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <h3 className="text-lg font-medium">Your Palettes</h3>
+                  <Dialog
+                    open={saveDialogOpen}
+                    onOpenChange={setSaveDialogOpen}
+                  >
+                    <DialogTrigger asChild>
+                      <Button size="sm">
+                        <Save className="h-4 w-4 mr-2" />
+                        Save Current
                       </Button>
-                      <Button onClick={handleSavePalette}>
-                        {editingPaletteId ? "Update" : "Save"} Palette
-                      </Button>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
-              </div>
-
-              {savedPalettes.length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">
-                  <p>You haven't saved any palettes yet.</p>
-                  <p className="text-sm mt-2">
-                    Save your current theme to start building your collection.
-                  </p>
-                </div>
-              ) : (
-                <ScrollArea className="h-[300px]">
-                  <div className="space-y-2">
-                    {savedPalettes.map((palette) => (
-                      <div
-                        key={palette.id}
-                        className="flex items-center justify-between p-3 border rounded-md"
-                      >
-                        <div className="flex items-center space-x-3 gap-3">
-                          <div className="flex space-x-2 items-center">
-                            {Object.entries(palette.lightColors)
-                              .filter(
-                                ([key]) =>
-                                  key === "--primary" ||
-                                  key === "--secondary" ||
-                                  key === "--accent"
-                              )
-                              .map(([key, value]) => (
-                                <div
-                                  key={key}
-                                  className="w-4 h-4 rounded-full border"
-                                  style={{ backgroundColor: `hsl(${value})` }}
-                                  title={key.replace("--", "")}
-                                />
-                              ))}
-                          </div>
-                          <div>
-                            <p className="font-medium">{palette.name}</p>
-                            <p className="text-xs text-muted-foreground">
-                              {new Date(palette.createdAt).toLocaleDateString()}
-                            </p>
-                          </div>
-                          <div className="flex gap-2">
-                            {Object.entries(palette.lightColors)
-                              .filter(
-                                ([key]) =>
-                                  key === "--primary" ||
-                                  (key === "--secondary" && palette.isDuoTone)
-                              )
-                              .map(([key, value]) => {
-                                // Parse HSL values correctly
-                                const hslParts = value.split(" ");
-                                const h = parseFloat(hslParts[0]);
-                                const s = parseFloat(
-                                  hslParts[1].replace("%", "")
-                                );
-                                const l = parseFloat(
-                                  hslParts[2].replace("%", "")
-                                );
-
-                                const hexValue = `#${hslToHex(h, s, l)}`;
-                                const hslValue = value;
-                                const colorName = key.replace("--", "");
-
-                                return (
-                                  <div
-                                    key={key}
-                                    className="text-xs flex flex-col gap-1"
-                                    title={colorName}
-                                  >
-                                    <span className="text-xs text-muted-foreground">
-                                      {key}
-                                    </span>
-
-                                    <Tooltip>
-                                      <TooltipTrigger asChild>
-                                        <span
-                                          className="font-medium cursor-pointer hover:text-primary transition-colors duration-200 hover:underline"
-                                          onClick={() =>
-                                            copyToClipboard(
-                                              hexValue,
-                                              `Hex color (${colorName})`
-                                            )
-                                          }
-                                        >
-                                          {hexValue}
-                                        </span>
-                                      </TooltipTrigger>
-                                      <TooltipContent>
-                                        <p>Click to copy hex value</p>
-                                      </TooltipContent>
-                                    </Tooltip>
-
-                                    <Tooltip>
-                                      <TooltipTrigger asChild>
-                                        <span
-                                          className="text-muted-foreground ml-1 cursor-pointer hover:text-muted-foreground/80 transition-colors duration-200 hover:underline"
-                                          onClick={() =>
-                                            copyToClipboard(
-                                              `hsl(${hslValue})`,
-                                              `HSL color (${colorName})`
-                                            )
-                                          }
-                                        >
-                                          (hsl: {value})
-                                        </span>
-                                      </TooltipTrigger>
-                                      <TooltipContent>
-                                        <p>Click to copy HSL value</p>
-                                      </TooltipContent>
-                                    </Tooltip>
-                                  </div>
-                                );
-                              })}
-                          </div>
-                        </div>
-                        <div className="flex space-x-2">
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => handleLoadPalette(palette.id!)}
-                                title="Load palette"
-                              >
-                                <Check className="h-4 w-4" />
-                              </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>Load palette</p>
-                            </TooltipContent>
-                          </Tooltip>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => handleEditPalette(palette)}
-                              >
-                                <Pencil className="h-4 w-4" />
-                              </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>Edit palette name</p>
-                            </TooltipContent>
-                          </Tooltip>
-
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => handleOverwritePalette(palette)}
-                              >
-                                <Save className="h-4 w-4" />
-                              </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>Overwrite with current settings</p>
-                            </TooltipContent>
-                          </Tooltip>
-
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => handleExportPalette(palette)}
-                              >
-                                <Download className="h-4 w-4" />
-                              </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>Export palette</p>
-                            </TooltipContent>
-                          </Tooltip>
-
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() =>
-                                  handleDeletePalette(palette.id!, palette.name)
-                                }
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>Delete palette</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </div>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>
+                          {editingPaletteId ? "Edit Palette" : "Save Palette"}
+                        </DialogTitle>
+                        <DialogDescription>
+                          {editingPaletteId
+                            ? "Edit the palette name and save your changes."
+                            : "Give your palette a name to save it to your collection."}
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="py-4">
+                        <Label htmlFor="palette-name">Palette Name</Label>
+                        <Input
+                          id="palette-name"
+                          value={paletteName}
+                          onChange={(e) => setPaletteName(e.target.value)}
+                          placeholder="My Awesome Theme"
+                        />
                       </div>
-                    ))}
-                  </div>
-                </ScrollArea>
-              )}
-            </div>
-          </TabsContent>
-
-          <TabsContent value="import-export">
-            <div className="space-y-6">
-              <div>
-                <h3 className="text-lg font-medium mb-2">
-                  Export Current Palette
-                </h3>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Export your current palette as a JSON file that you can share
-                  or import later.
-                </p>
-
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button onClick={handleExportCurrentPalette}>
-                      <Download className="h-4 w-4 mr-2" />
-                      Export Current Palette
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Save your current palette as a JSON file</p>
-                  </TooltipContent>
-                </Tooltip>
-              </div>
-
-              <Separator />
-
-              <div>
-                <h3 className="text-lg font-medium mb-2">Import Palette</h3>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Import a palette from a JSON file or paste JSON data directly.
-                </p>
-                <Dialog
-                  open={importDialogOpen}
-                  onOpenChange={setImportDialogOpen}
-                >
-                  <DialogTrigger asChild>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button>
-                          <Upload className="h-4 w-4 mr-2" />
-                          Import Palette
+                      <DialogFooter>
+                        <Button
+                          variant="outline"
+                          onClick={() => {
+                            setSaveDialogOpen(false);
+                            setEditingPaletteId(undefined);
+                            setPaletteName("");
+                          }}
+                        >
+                          Cancel
                         </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Load a palette from a JSON file</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Import Palette</DialogTitle>
-                      <DialogDescription>
-                        Paste the JSON data of a palette to import it.
-                      </DialogDescription>
-                    </DialogHeader>
-                    <div className="py-4">
-                      <Label htmlFor="import-data">Palette JSON Data</Label>
-                      <Textarea
-                        id="import-data"
-                        className="w-full h-[200px] p-2 border rounded-md font-mono text-sm mt-2"
-                        value={importData}
-                        onChange={(e) => setImportData(e.target.value)}
-                        placeholder='{"name":"My Theme","lightColors":{"--primary":"222.2 47.4% 11.2%"},"darkColors":{"--primary":"210 40% 98%"},"borderRadius":0.5}'
-                      />
-                      {importError && (
-                        <p className="text-sm text-destructive mt-2">
-                          {importError}
-                        </p>
-                      )}
+                        <Button onClick={handleSavePalette}>
+                          {editingPaletteId ? "Update" : "Save"} Palette
+                        </Button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
+                </div>
+
+                {savedPalettes.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <p>You haven't saved any palettes yet.</p>
+                    <p className="text-sm mt-2">
+                      Save your current theme to start building your collection.
+                    </p>
+                  </div>
+                ) : (
+                  <ScrollArea className="h-[300px]">
+                    <div className="space-y-2">
+                      {savedPalettes.map((palette) => (
+                        <div
+                          key={palette.id}
+                          className="flex items-center justify-between p-3 border rounded-md"
+                        >
+                          <div className="flex items-center space-x-3 gap-3">
+                            <div className="flex flex-col gap-1">
+                              <div className="flex space-x-2 items-center">
+                                {Object.entries(palette.lightColors)
+                                  .filter(
+                                    ([key]) =>
+                                      key === "--primary" ||
+                                      key === "--secondary" ||
+                                      key === "--accent"
+                                  )
+                                  .map(([key, value]) => (
+                                    <div
+                                      key={key}
+                                      className="w-4 h-4 rounded-full border"
+                                      style={{
+                                        backgroundColor: `hsl(${value})`,
+                                      }}
+                                      title={key.replace("--", "")}
+                                    />
+                                  ))}
+                              </div>
+                              <p className="font-medium">{palette.name}</p>
+                              <p className="text-xs text-muted-foreground">
+                                {new Date(
+                                  palette.createdAt
+                                ).toLocaleDateString()}
+                              </p>
+                            </div>
+                            <div className="flex gap-2">
+                              {Object.entries(palette.lightColors)
+                                .filter(
+                                  ([key]) =>
+                                    key === "--primary" ||
+                                    (key === "--secondary" && palette.isDuoTone)
+                                )
+                                .map(([key, value]) => {
+                                  // Parse HSL values correctly
+                                  const hslParts = value.split(" ");
+                                  const h = parseFloat(hslParts[0]);
+                                  const s = parseFloat(
+                                    hslParts[1].replace("%", "")
+                                  );
+                                  const l = parseFloat(
+                                    hslParts[2].replace("%", "")
+                                  );
+
+                                  const hexValue = `#${hslToHex(h, s, l)}`;
+                                  const hslValue = value;
+                                  const colorName = key.replace("--", "");
+
+                                  return (
+                                    <div
+                                      key={key}
+                                      className="text-xs flex flex-col gap-1"
+                                      title={colorName}
+                                    >
+                                      <span className="text-xs text-muted-foreground">
+                                        {key}
+                                      </span>
+
+                                      <Tooltip>
+                                        <TooltipTrigger asChild>
+                                          <span
+                                            className="font-medium cursor-pointer hover:text-primary transition-colors duration-200 hover:underline"
+                                            onClick={() =>
+                                              copyToClipboard(
+                                                hexValue,
+                                                `Hex color (${colorName})`
+                                              )
+                                            }
+                                          >
+                                            {hexValue}
+                                          </span>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                          <p>Click to copy hex value</p>
+                                        </TooltipContent>
+                                      </Tooltip>
+
+                                      <Tooltip>
+                                        <TooltipTrigger asChild>
+                                          <span
+                                            className="text-muted-foreground ml-1 cursor-pointer hover:text-muted-foreground/80 transition-colors duration-200 hover:underline"
+                                            onClick={() =>
+                                              copyToClipboard(
+                                                `hsl(${hslValue})`,
+                                                `HSL color (${colorName})`
+                                              )
+                                            }
+                                          >
+                                            (hsl: {value})
+                                          </span>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                          <p>Click to copy HSL value</p>
+                                        </TooltipContent>
+                                      </Tooltip>
+                                    </div>
+                                  );
+                                })}
+                            </div>
+                          </div>
+                          <div className="flex space-x-2">
+                            {/* Desktop view - show buttons with tooltips */}
+                            <div className="hidden md:flex space-x-2">
+                              {paletteActions.map((action) => (
+                                <Tooltip key={action.id}>
+                                  <TooltipTrigger asChild>
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      onClick={() => action.onClick(palette)}
+                                      title={action.label}
+                                    >
+                                      <action.icon className="h-4 w-4" />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p>{action.label}</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              ))}
+                            </div>
+
+                            {/* Mobile view - show dropdown menu */}
+                            <div className="md:hidden">
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button variant="ghost" size="icon">
+                                    <MoreHorizontal className="h-4 w-4" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  <DropdownMenuLabel>
+                                    Palette Actions
+                                  </DropdownMenuLabel>
+                                  <DropdownMenuSeparator />
+                                  {paletteActions.map((action) => (
+                                    <DropdownMenuItem
+                                      key={action.id}
+                                      onClick={() => action.onClick(palette)}
+                                    >
+                                      <action.icon className="mr-2 h-4 w-4" />
+                                      {action.label}
+                                    </DropdownMenuItem>
+                                  ))}
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                    <DialogFooter>
+                  </ScrollArea>
+                )}
+              </div>
+            </TabsContent>
+
+            <TabsContent value="import-export">
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-lg font-medium mb-2">
+                    Export Current Palette
+                  </h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Export your current palette as a JSON file that you can
+                    share or import later.
+                  </p>
+
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button onClick={handleExportCurrentPalette}>
+                        <Download className="h-4 w-4 mr-2" />
+                        Export Current Palette
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Save your current palette as a JSON file</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
+
+                <Separator />
+
+                <div>
+                  <h3 className="text-lg font-medium mb-2">Import Palette</h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Import a palette from a JSON file or paste JSON data
+                    directly.
+                  </p>
+                  <Dialog
+                    open={importDialogOpen}
+                    onOpenChange={setImportDialogOpen}
+                  >
+                    <DialogTrigger asChild>
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <Button
-                            variant="outline"
-                            onClick={() => setImportDialogOpen(false)}
-                          >
-                            Cancel
+                          <Button>
+                            <Upload className="h-4 w-4 mr-2" />
+                            Import Palette
                           </Button>
                         </TooltipTrigger>
                         <TooltipContent>
-                          <p>Close without importing</p>
+                          <p>Load a palette from a JSON file</p>
                         </TooltipContent>
                       </Tooltip>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Import Palette</DialogTitle>
+                        <DialogDescription>
+                          Paste the JSON data of a palette to import it.
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="py-4">
+                        <Label htmlFor="import-data">Palette JSON Data</Label>
+                        <Textarea
+                          id="import-data"
+                          className="w-full h-[200px] p-2 border rounded-md font-mono text-sm mt-2"
+                          value={importData}
+                          onChange={(e) => setImportData(e.target.value)}
+                          placeholder='{"name":"My Theme","lightColors":{"--primary":"222.2 47.4% 11.2%"},"darkColors":{"--primary":"210 40% 98%"},"borderRadius":0.5}'
+                        />
+                        {importError && (
+                          <p className="text-sm text-destructive mt-2">
+                            {importError}
+                          </p>
+                        )}
+                      </div>
+                      <DialogFooter>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="outline"
+                              onClick={() => setImportDialogOpen(false)}
+                            >
+                              Cancel
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Close without importing</p>
+                          </TooltipContent>
+                        </Tooltip>
 
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button onClick={handleImportPalette}>Import</Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>Import the palette from JSON</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button onClick={handleImportPalette}>
+                              Import
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Import the palette from JSON</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
+                </div>
               </div>
-            </div>
-          </TabsContent>
-        </Tabs>
+            </TabsContent>
+          </Tabs>
+        )}
       </CardContent>
     </Card>
   );

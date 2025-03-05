@@ -12,6 +12,7 @@ interface PaletteState {
   lightColors: Record<string, string>;
   darkColors: Record<string, string>;
   borderRadius: number;
+  showActionsContainer: boolean;
   
   // Saved palettes
   savedPalettes: Palette[];
@@ -21,6 +22,7 @@ interface PaletteState {
   setLightColors: (colors: Record<string, string>) => void;
   setDarkColors: (colors: Record<string, string>) => void;
   setBorderRadius: (radius: number) => void;
+  setShowActionsContainer: (show: boolean) => void;
   resetTheme: () => Promise<void>;
   
   // Palette management
@@ -46,8 +48,10 @@ export const usePaletteStore = create<PaletteState>()(
       darkColors: getDefaultColors('dark'),
       borderRadius: 0.5,
       savedPalettes: [],
+      showActionsContainer: true,
       
       // Theme actions
+      setShowActionsContainer: (show: boolean) => set({ showActionsContainer: show }),
       setIsDarkMode: (isDarkMode: boolean) => set({ isDarkMode }),
       setLightColors: (colors: Record<string, string>) => set({ lightColors: colors }),
       setDarkColors: (colors: Record<string, string>) => set({ darkColors: colors }),
