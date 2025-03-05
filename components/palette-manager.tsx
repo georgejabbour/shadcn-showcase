@@ -36,6 +36,7 @@ import {
   FileJson,
 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { Textarea } from "@/components/ui/textarea";
 
 // Debug utility function
 const debugPalette = (palette: Palette) => {
@@ -530,7 +531,7 @@ export function PaletteManager() {
                     </DialogHeader>
                     <div className="py-4">
                       <Label htmlFor="import-data">Palette JSON Data</Label>
-                      <textarea
+                      <Textarea
                         id="import-data"
                         className="w-full h-[200px] p-2 border rounded-md font-mono text-sm mt-2"
                         value={importData}
