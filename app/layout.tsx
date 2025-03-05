@@ -4,7 +4,7 @@ import { ThemeProvider } from '@/components/theme-provider'
 import { Toaster } from '@/components/ui/toaster'
 import { ConfirmDialog } from '@/components/confirm-dialog'
 import { SavePaletteDialog } from '@/components/save-palette-dialog'
-
+import { TooltipProvider } from '@/components/ui/tooltip'
 export const metadata: Metadata = {
   title: 'v0 App',
   description: 'Created with v0',
@@ -24,11 +24,14 @@ export default function RootLayout({
           defaultTheme="dark"
           enableSystem={false}
           disableTransitionOnChange
+          
         >
-          {children}
-          <Toaster />
-          <ConfirmDialog />
-          <SavePaletteDialog />
+          <TooltipProvider delayDuration={300}>
+            {children}
+            <Toaster />
+            <ConfirmDialog />
+            <SavePaletteDialog />
+          </TooltipProvider>
         </ThemeProvider>
       </body>
     </html>

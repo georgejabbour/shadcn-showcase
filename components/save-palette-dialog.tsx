@@ -18,12 +18,14 @@ import { create } from 'zustand'
 interface SavePaletteDialogState {
   isOpen: boolean;
   paletteName: string;
+  existingPaletteId?: number;
   onConfirm: (isDuoTone: boolean) => void;
   onCancel: () => void;
   
   // Actions
   open: (options: {
     paletteName: string;
+    existingPaletteId?: number;
     onConfirm: (isDuoTone: boolean) => void;
     onCancel: () => void;
   }) => void;
@@ -33,12 +35,14 @@ interface SavePaletteDialogState {
 export const useSavePaletteDialog = create<SavePaletteDialogState>((set) => ({
   isOpen: false,
   paletteName: '',
+  existingPaletteId: undefined,
   onConfirm: () => {},
   onCancel: () => {},
   
   open: (options) => set({
     isOpen: true,
     paletteName: options.paletteName,
+    existingPaletteId: options.existingPaletteId,
     onConfirm: options.onConfirm,
     onCancel: options.onCancel,
   }),
@@ -47,7 +51,7 @@ export const useSavePaletteDialog = create<SavePaletteDialogState>((set) => ({
 }));
 
 export function SavePaletteDialog() {
-  const { isOpen, paletteName, onConfirm, onCancel, close } = useSavePaletteDialog();
+  const { isOpen, paletteName, existingPaletteId, onConfirm, onCancel, close } = useSavePaletteDialog();
   const [isDuoTone, setIsDuoTone] = useState(false);
 
   const handleConfirm = () => {
@@ -66,9 +70,11 @@ export function SavePaletteDialog() {
     <AlertDialog open={isOpen} onOpenChange={(open) => !open && handleCancel()}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Save Palette</AlertDialogTitle>
+          <AlertDialogTitle>{existingPaletteId ? 'Update Palette' : 'Save Palette'}</AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to save the palette "{paletteName}"?
+            {existingPaletteId 
+              ? `Are you sure you want to update the palette "${paletteName}"?`
+              : `Are you sure you want to save the palette "${paletteName}"?`}
           </AlertDialogDescription>
         </AlertDialogHeader>
         
@@ -96,7 +102,7 @@ export function SavePaletteDialog() {
             Cancel
           </AlertDialogCancel>
           <AlertDialogAction onClick={handleConfirm}>
-            Save
+            {existingPaletteId ? 'Update' : 'Save'}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

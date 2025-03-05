@@ -35,6 +35,7 @@ import {
   X,
   FileJson,
   Copy,
+  Pencil,
 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { Textarea } from "@/components/ui/textarea";
@@ -84,6 +85,9 @@ export function PaletteManager() {
   const [importDialogOpen, setImportDialogOpen] = useState(false);
   const [importData, setImportData] = useState("");
   const [importError, setImportError] = useState("");
+  const [editingPaletteId, setEditingPaletteId] = useState<number | undefined>(
+    undefined
+  );
   const { toast } = useToast();
 
   // Load saved palettes on component mount
@@ -115,7 +119,7 @@ export function PaletteManager() {
       console.log("Current dark colors:", currentState.darkColors);
       console.log("Current border radius:", currentState.borderRadius);
 
-      const id = await savePalette(paletteName.trim());
+      const id = await savePalette(paletteName.trim(), editingPaletteId);
 
       // If id is -1, the user cancelled the confirmation
       if (id === -1) {
@@ -124,10 +128,13 @@ export function PaletteManager() {
 
       setPaletteName("");
       setSaveDialogOpen(false);
+      setEditingPaletteId(undefined);
 
       toast({
-        title: "Palette saved",
-        description: `"${paletteName}" has been saved to your collection.`,
+        title: editingPaletteId ? "Palette updated" : "Palette saved",
+        description: `"${paletteName}" has been ${
+          editingPaletteId ? "updated" : "saved"
+        } to your collection.`,
       });
     } catch (error) {
       console.error("Error saving palette:", error);
@@ -432,6 +439,56 @@ export function PaletteManager() {
     );
   };
 
+  // Handle editing a palette name
+  const handleEditPalette = (palette: Palette) => {
+    setPaletteName(palette.name);
+    setEditingPaletteId(palette.id);
+    setSaveDialogOpen(true);
+  };
+
+  // Handle overwriting an existing palette with current settings
+  const handleOverwritePalette = async (palette: Palette) => {
+    try {
+      setPaletteName(palette.name);
+      setEditingPaletteId(palette.id);
+
+      // Get the current state directly from the store to ensure we're saving the latest values
+      console.log("Overwriting palette:", palette.name);
+
+      // Log the current state for debugging
+      const currentState = usePaletteStore.getState();
+      console.log("Current light colors:", currentState.lightColors);
+      console.log("Current dark colors:", currentState.darkColors);
+      console.log("Current border radius:", currentState.borderRadius);
+
+      const id = await savePalette(palette.name, palette.id);
+
+      // If id is -1, the user cancelled the confirmation
+      if (id === -1) {
+        setEditingPaletteId(undefined);
+        setPaletteName("");
+        return;
+      }
+
+      setEditingPaletteId(undefined);
+      setPaletteName("");
+
+      toast({
+        title: "Palette updated",
+        description: `"${palette.name}" has been updated with your current settings.`,
+      });
+    } catch (error) {
+      console.error("Error overwriting palette:", error);
+      toast({
+        title: "Error",
+        description: "There was an error updating your palette.",
+        variant: "destructive",
+      });
+      setEditingPaletteId(undefined);
+      setPaletteName("");
+    }
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -460,9 +517,13 @@ export function PaletteManager() {
                   </DialogTrigger>
                   <DialogContent>
                     <DialogHeader>
-                      <DialogTitle>Save Palette</DialogTitle>
+                      <DialogTitle>
+                        {editingPaletteId ? "Edit Palette" : "Save Palette"}
+                      </DialogTitle>
                       <DialogDescription>
-                        Give your palette a name to save it to your collection.
+                        {editingPaletteId
+                          ? "Edit the palette name and save your changes."
+                          : "Give your palette a name to save it to your collection."}
                       </DialogDescription>
                     </DialogHeader>
                     <div className="py-4">
@@ -477,11 +538,17 @@ export function PaletteManager() {
                     <DialogFooter>
                       <Button
                         variant="outline"
-                        onClick={() => setSaveDialogOpen(false)}
+                        onClick={() => {
+                          setSaveDialogOpen(false);
+                          setEditingPaletteId(undefined);
+                          setPaletteName("");
+                        }}
                       >
                         Cancel
                       </Button>
-                      <Button onClick={handleSavePalette}>Save Palette</Button>
+                      <Button onClick={handleSavePalette}>
+                        {editingPaletteId ? "Update" : "Save"} Palette
+                      </Button>
                     </DialogFooter>
                   </DialogContent>
                 </Dialog>
@@ -557,79 +624,126 @@ export function PaletteManager() {
                                     <span className="text-xs text-muted-foreground">
                                       {key}
                                     </span>
-                                    <TooltipProvider>
-                                      <Tooltip>
-                                        <TooltipTrigger asChild>
-                                          <span
-                                            className="font-medium cursor-pointer hover:text-primary transition-colors duration-200 hover:underline"
-                                            onClick={() =>
-                                              copyToClipboard(
-                                                hexValue,
-                                                `Hex color (${colorName})`
-                                              )
-                                            }
-                                          >
-                                            {hexValue}
-                                          </span>
-                                        </TooltipTrigger>
-                                        <TooltipContent>
-                                          <p>Click to copy hex value</p>
-                                        </TooltipContent>
-                                      </Tooltip>
-                                    </TooltipProvider>
 
-                                    <TooltipProvider>
-                                      <Tooltip>
-                                        <TooltipTrigger asChild>
-                                          <span
-                                            className="text-muted-foreground ml-1 cursor-pointer hover:text-muted-foreground/80 transition-colors duration-200 hover:underline"
-                                            onClick={() =>
-                                              copyToClipboard(
-                                                `hsl(${hslValue})`,
-                                                `HSL color (${colorName})`
-                                              )
-                                            }
-                                          >
-                                            (hsl: {value})
-                                          </span>
-                                        </TooltipTrigger>
-                                        <TooltipContent>
-                                          <p>Click to copy HSL value</p>
-                                        </TooltipContent>
-                                      </Tooltip>
-                                    </TooltipProvider>
+                                    <Tooltip>
+                                      <TooltipTrigger asChild>
+                                        <span
+                                          className="font-medium cursor-pointer hover:text-primary transition-colors duration-200 hover:underline"
+                                          onClick={() =>
+                                            copyToClipboard(
+                                              hexValue,
+                                              `Hex color (${colorName})`
+                                            )
+                                          }
+                                        >
+                                          {hexValue}
+                                        </span>
+                                      </TooltipTrigger>
+                                      <TooltipContent>
+                                        <p>Click to copy hex value</p>
+                                      </TooltipContent>
+                                    </Tooltip>
+
+                                    <Tooltip>
+                                      <TooltipTrigger asChild>
+                                        <span
+                                          className="text-muted-foreground ml-1 cursor-pointer hover:text-muted-foreground/80 transition-colors duration-200 hover:underline"
+                                          onClick={() =>
+                                            copyToClipboard(
+                                              `hsl(${hslValue})`,
+                                              `HSL color (${colorName})`
+                                            )
+                                          }
+                                        >
+                                          (hsl: {value})
+                                        </span>
+                                      </TooltipTrigger>
+                                      <TooltipContent>
+                                        <p>Click to copy HSL value</p>
+                                      </TooltipContent>
+                                    </Tooltip>
                                   </div>
                                 );
                               })}
                           </div>
                         </div>
                         <div className="flex space-x-2">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleLoadPalette(palette.id!)}
-                            title="Load palette"
-                          >
-                            <Check className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleExportPalette(palette)}
-                            title="Export palette"
-                          >
-                            <Download className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() =>
-                              handleDeletePalette(palette.id!, palette.name)
-                            }
-                            title="Delete palette"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => handleLoadPalette(palette.id!)}
+                                title="Load palette"
+                              >
+                                <Check className="h-4 w-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Load palette</p>
+                            </TooltipContent>
+                          </Tooltip>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => handleEditPalette(palette)}
+                              >
+                                <Pencil className="h-4 w-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Edit palette name</p>
+                            </TooltipContent>
+                          </Tooltip>
+
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => handleOverwritePalette(palette)}
+                              >
+                                <Save className="h-4 w-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Overwrite with current settings</p>
+                            </TooltipContent>
+                          </Tooltip>
+
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => handleExportPalette(palette)}
+                              >
+                                <Download className="h-4 w-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Export palette</p>
+                            </TooltipContent>
+                          </Tooltip>
+
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() =>
+                                  handleDeletePalette(palette.id!, palette.name)
+                                }
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Delete palette</p>
+                            </TooltipContent>
+                          </Tooltip>
                         </div>
                       </div>
                     ))}
@@ -649,10 +763,18 @@ export function PaletteManager() {
                   Export your current palette as a JSON file that you can share
                   or import later.
                 </p>
-                <Button onClick={handleExportCurrentPalette}>
-                  <Download className="h-4 w-4 mr-2" />
-                  Export Current Palette
-                </Button>
+
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button onClick={handleExportCurrentPalette}>
+                      <Download className="h-4 w-4 mr-2" />
+                      Export Current Palette
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Save your current palette as a JSON file</p>
+                  </TooltipContent>
+                </Tooltip>
               </div>
 
               <Separator />
@@ -667,10 +789,17 @@ export function PaletteManager() {
                   onOpenChange={setImportDialogOpen}
                 >
                   <DialogTrigger asChild>
-                    <Button>
-                      <Upload className="h-4 w-4 mr-2" />
-                      Import Palette
-                    </Button>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button>
+                          <Upload className="h-4 w-4 mr-2" />
+                          Import Palette
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Load a palette from a JSON file</p>
+                      </TooltipContent>
+                    </Tooltip>
                   </DialogTrigger>
                   <DialogContent>
                     <DialogHeader>
@@ -695,13 +824,28 @@ export function PaletteManager() {
                       )}
                     </div>
                     <DialogFooter>
-                      <Button
-                        variant="outline"
-                        onClick={() => setImportDialogOpen(false)}
-                      >
-                        Cancel
-                      </Button>
-                      <Button onClick={handleImportPalette}>Import</Button>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="outline"
+                            onClick={() => setImportDialogOpen(false)}
+                          >
+                            Cancel
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Close without importing</p>
+                        </TooltipContent>
+                      </Tooltip>
+
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button onClick={handleImportPalette}>Import</Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Import the palette from JSON</p>
+                        </TooltipContent>
+                      </Tooltip>
                     </DialogFooter>
                   </DialogContent>
                 </Dialog>

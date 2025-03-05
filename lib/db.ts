@@ -42,14 +42,21 @@ class PaletteDatabase extends Dexie {
 export const db = new PaletteDatabase();
 
 // Helper functions for palette operations
-export async function savePalette(palette: Omit<Palette, 'id' | 'createdAt' | 'isDuoTone'> & { isDuoTone?: boolean }): Promise<number> {
+export async function savePalette(palette: Omit<Palette, 'createdAt' | 'isDuoTone'> & { isDuoTone?: boolean }): Promise<number> {
   const formattedPalette = {
     ...palette,
-    createdAt: new Date(),
+    createdAt: palette.id ? (await db.palettes.get(palette.id))?.createdAt || new Date() : new Date(),
     isDuoTone: palette.isDuoTone ?? false
   };
   
-  return await db.palettes.add(formattedPalette);
+  if (palette.id) {
+    // Update existing palette
+    await db.palettes.update(palette.id, formattedPalette);
+    return palette.id;
+  } else {
+    // Add new palette
+    return await db.palettes.add(formattedPalette);
+  }
 }
 
 export async function getPalettes(): Promise<Palette[]> {

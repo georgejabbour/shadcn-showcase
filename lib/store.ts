@@ -24,7 +24,7 @@ interface PaletteState {
   resetTheme: () => Promise<void>;
   
   // Palette management
-  savePalette: (name: string) => Promise<number>;
+  savePalette: (name: string, existingPaletteId?: number) => Promise<number>;
   loadPalette: (id: number) => Promise<void>;
   loadSavedPalettes: () => Promise<void>;
   deletePalette: (id: number) => Promise<void>;
@@ -87,13 +87,14 @@ export const usePaletteStore = create<PaletteState>()(
       },
       
       // Palette management
-      savePalette: async (name: string) => {
+      savePalette: async (name: string, existingPaletteId?: number) => {
         const { lightColors, darkColors, borderRadius } = get();
         
         // Use the save palette dialog with duo-tone option
         return new Promise<number>((resolve) => {
           useSavePaletteDialog.getState().open({
             paletteName: name,
+            existingPaletteId,
             onConfirm: async (isDuoTone) => {
               // Log the values being saved for debugging
               console.log("Store - Saving palette:", name);
@@ -101,8 +102,10 @@ export const usePaletteStore = create<PaletteState>()(
               console.log("Store - Dark colors:", darkColors);
               console.log("Store - Border radius:", borderRadius);
               console.log("Store - Is duo-tone:", isDuoTone);
+              console.log("Store - Existing palette ID:", existingPaletteId);
               
               const id = await dbSavePalette({
+                id: existingPaletteId,
                 name,
                 lightColors,
                 darkColors,
