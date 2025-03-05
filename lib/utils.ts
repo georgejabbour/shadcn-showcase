@@ -138,3 +138,75 @@ export function generateColorPalette(primaryHex: string) {
   }
 }
 
+// Generate a duotone color palette based on primary and secondary colors
+export function generateDuotoneColorPalette(primaryHex: string, secondaryHex: string) {
+  // Convert colors to HSL
+  const [primaryH, primaryS, primaryL] = hexToHsl(primaryHex)
+  const [secondaryH, secondaryS, secondaryL] = hexToHsl(secondaryHex)
+
+  // Create light mode palette
+  const lightPalette = {
+    background: `${primaryH} ${Math.min(primaryS * 0.05, 5)}% 99%`,
+    foreground: `${primaryH} ${Math.max(5, primaryS - 5)}% 4.5%`,
+    card: `${primaryH} ${Math.min(primaryS * 0.05, 5)}% 99%`,
+    "card-foreground": `${primaryH} ${Math.max(5, primaryS - 5)}% 4.5%`,
+    popover: `${primaryH} ${Math.min(primaryS * 0.05, 5)}% 99%`,
+    "popover-foreground": `${primaryH} ${Math.max(5, primaryS - 5)}% 4.5%`,
+    primary: `${primaryH} ${Math.min(100, primaryS + 10)}% ${Math.min(60, primaryL + 5)}%`,
+    "primary-foreground": `${primaryH} ${Math.max(0, primaryS - 15)}% 98%`,
+    secondary: `${secondaryH} ${Math.min(100, secondaryS + 5)}% ${Math.min(90, secondaryL + 5)}%`,
+    "secondary-foreground": `${secondaryH} ${Math.max(5, secondaryS - 5)}% 10%`,
+    muted: `${secondaryH} ${Math.max(5, secondaryS - 10)}% 96.5%`,
+    "muted-foreground": `${secondaryH} ${Math.max(5, secondaryS - 10)}% 48%`,
+    accent: `${secondaryH} ${Math.max(5, secondaryS - 5)}% 90%`,
+    "accent-foreground": `${secondaryH} ${Math.max(5, secondaryS - 5)}% 10%`,
+    destructive: "0 90% 65%",
+    "destructive-foreground": "0 0% 98%",
+    border: `${primaryH} ${Math.max(5, primaryS - 10)}% 92%`,
+    input: `${primaryH} ${Math.max(5, primaryS - 10)}% 92%`,
+    ring: `${primaryH} ${Math.min(100, primaryS + 10)}% ${Math.min(90, primaryL + 5)}%`,
+    "chart-1": `${primaryH} 85% 65%`,
+    "chart-2": `${secondaryH} 70% 45%`,
+    "chart-3": `${(primaryH + 180) % 360} 60% 35%`,
+    "chart-4": `${(secondaryH + 180) % 360} 80% 70%`,
+    "chart-5": `${(primaryH + secondaryH) / 2} 90% 70%`,
+    "gradient-one": `${primaryH} 100% 60%`,
+    "gradient-two": `${secondaryH} 80% 60%`,
+  }
+
+  // Create dark mode palette
+  const darkPalette = {
+    background: `${primaryH} ${Math.max(Math.min(primaryS * 0.15, 20), 5)}% 4.5%`,
+    foreground: `${primaryH} ${Math.max(0, primaryS - 15)}% 98%`,
+    card: `${primaryH} ${Math.max(Math.min(primaryS * 0.15, 20), 5)}% 4.5%`,
+    "card-foreground": `${primaryH} ${Math.max(0, primaryS - 15)}% 98%`,
+    popover: `${primaryH} ${Math.max(Math.min(primaryS * 0.15, 20), 5)}% 4.5%`,
+    "popover-foreground": `${primaryH} ${Math.max(0, primaryS - 15)}% 98%`,
+    primary: `${primaryH} ${Math.min(100, primaryS + 10)}% 80%`,
+    "primary-foreground": `${primaryH} ${Math.min(100, primaryS + 5)}% ${Math.max(12, primaryL - 15)}%`,
+    secondary: `${secondaryH} ${Math.min(100, secondaryS + 10)}% 70%`,
+    "secondary-foreground": `${secondaryH} ${Math.max(0, secondaryS - 15)}% 98%`,
+    muted: `${secondaryH} ${Math.min(100, secondaryS + 5)}% 18%`,
+    "muted-foreground": `${secondaryH} ${Math.max(5, secondaryS - 10)}% 68%`,
+    accent: `${secondaryH} ${Math.min(100, secondaryS + 5)}% 25%`,
+    "accent-foreground": `${secondaryH} ${Math.max(0, secondaryS - 15)}% 98%`,
+    destructive: "0 70% 35%",
+    "destructive-foreground": "0 0% 98%",
+    border: `${primaryH} ${Math.min(100, primaryS + 5)}% 18%`,
+    input: `${primaryH} ${Math.min(100, primaryS + 5)}% 18%`,
+    ring: `${primaryH} ${Math.max(5, primaryS - 10)}% 85%`,
+    "chart-1": `${primaryH} 80% 55%`,
+    "chart-2": `${secondaryH} 70% 50%`,
+    "chart-3": `${(primaryH + 180) % 360} 85% 60%`,
+    "chart-4": `${(secondaryH + 180) % 360} 75% 65%`,
+    "chart-5": `${(primaryH + secondaryH) / 2} 85% 60%`,
+    "gradient-one": `${primaryH} 100% 60%`,
+    "gradient-two": `${secondaryH} 80% 60%`,
+  }
+
+  return {
+    light: lightPalette,
+    dark: darkPalette,
+  }
+}
+

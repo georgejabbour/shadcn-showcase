@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Copy, RefreshCw } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 
 interface ColorPalette {
   background: string
@@ -36,9 +37,11 @@ interface ColorPalette {
   chart5: string
 }
 
+type PaletteMode = "single" | "duotone"
+
 // Update the ColorPaletteGenerator component to accept the onApplyPalette prop
 interface ColorPaletteGeneratorProps {
-  onApplyPalette: (primaryColor: string) => void
+  onApplyPalette: (primaryColor: string, secondaryColor?: string, mode?: PaletteMode) => void
 }
 
 export function ColorPaletteGenerator({ onApplyPalette }: ColorPaletteGeneratorProps) {
@@ -52,22 +55,35 @@ export function ColorPaletteGenerator({ onApplyPalette }: ColorPaletteGeneratorP
     }
     return "#000000"
   })
+  const [secondaryColor, setSecondaryColor] = useState(() => {
+    if (typeof window !== "undefined") {
+      const savedColor = localStorage.getItem("shadcn-theme-secondary-color")
+      return savedColor || "#6366f1"
+    }
+    return "#6366f1"
+  })
+  const [paletteMode, setPaletteMode] = useState<PaletteMode>("single")
   const [lightPalette, setLightPalette] = useState<ColorPalette | null>(null)
   const [darkPalette, setDarkPalette] = useState<ColorPalette | null>(null)
   const { toast } = useToast()
 
   useEffect(() => {
-    if (primaryColor) {
+    if (paletteMode === "single" && primaryColor) {
       generatePalettes(primaryColor)
+    } else if (paletteMode === "duotone" && primaryColor && secondaryColor) {
+      generateDuotonePalettes(primaryColor, secondaryColor)
     }
-  }, [primaryColor])
+  }, [primaryColor, secondaryColor, paletteMode])
 
-  // Add an effect to save the color to localStorage when it changes
+  // Add an effect to save the colors to localStorage when they change
   useEffect(() => {
     if (primaryColor && typeof window !== "undefined") {
       localStorage.setItem("shadcn-theme-primary-color", primaryColor)
     }
-  }, [primaryColor])
+    if (secondaryColor && typeof window !== "undefined") {
+      localStorage.setItem("shadcn-theme-secondary-color", secondaryColor)
+    }
+  }, [primaryColor, secondaryColor])
 
   // Update the generatePalettes function to ensure it produces more vibrant colors
   const generatePalettes = (color: string) => {
@@ -138,14 +154,98 @@ export function ColorPaletteGenerator({ onApplyPalette }: ColorPaletteGeneratorP
     }
   }
 
+  // Add a new function to generate duotone palettes
+  const generateDuotonePalettes = (primaryColorHex: string, secondaryColorHex: string) => {
+    try {
+      // Convert hex to HSL
+      const primaryHSL = hexToHSL(primaryColorHex)
+      const secondaryHSL = hexToHSL(secondaryColorHex)
+
+      // Generate light palette
+      const light = {
+        background: `${primaryHSL.h} ${Math.min(primaryHSL.s * 0.05, 5)}% 99%`,
+        foreground: `${primaryHSL.h} 10% 6.9%`,
+        card: `${primaryHSL.h} ${Math.min(primaryHSL.s * 0.05, 5)}% 99%`,
+        cardForeground: `${primaryHSL.h} 10% 6.9%`,
+        popover: `${primaryHSL.h} ${Math.min(primaryHSL.s * 0.05, 5)}% 99%`,
+        popoverForeground: `${primaryHSL.h} 10% 6.9%`,
+        primary: `${primaryHSL.h} ${Math.min(primaryHSL.s + 10, 100)}% ${Math.min(primaryHSL.l + 5, 60)}%`,
+        primaryForeground: "0 0% 98%",
+        secondary: `${secondaryHSL.h} ${Math.min(secondaryHSL.s + 5, 100)}% ${Math.min(secondaryHSL.l + 5, 90)}%`,
+        secondaryForeground: `${secondaryHSL.h} ${secondaryHSL.s}% 10%`,
+        muted: `${secondaryHSL.h} ${Math.max(secondaryHSL.s - 30, 0)}% 95.9%`,
+        mutedForeground: `${secondaryHSL.h} ${Math.max(secondaryHSL.s - 30, 0)}% 46.1%`,
+        accent: `${primaryHSL.h} ${Math.max(primaryHSL.s - 20, 0)}% 90%`,
+        accentForeground: `${primaryHSL.h} ${primaryHSL.s}% 10%`,
+        destructive: "0 84.2% 60.2%",
+        destructiveForeground: "0 0% 98%",
+        border: `${primaryHSL.h} ${Math.max(primaryHSL.s - 25, 0)}% 90%`,
+        input: `${primaryHSL.h} ${Math.max(primaryHSL.s - 25, 0)}% 90%`,
+        ring: `${primaryHSL.h} ${primaryHSL.s}% 10%`,
+        chart1: `${primaryHSL.h} 76% 61%`,
+        chart2: `${secondaryHSL.h} 58% 39%`,
+        chart3: `${(primaryHSL.h + 180) % 360} 37% 24%`,
+        chart4: `${(secondaryHSL.h + 180) % 360} 74% 66%`,
+        chart5: `${(primaryHSL.h + secondaryHSL.h) / 2} 87% 67%`,
+      }
+
+      // Generate dark palette
+      const dark = {
+        background: `${primaryHSL.h} ${Math.max(Math.min(primaryHSL.s * 0.15, 20), 5)}% 6.9%`,
+        foreground: "0 0% 98%",
+        card: `${primaryHSL.h} ${Math.max(Math.min(primaryHSL.s * 0.15, 20), 5)}% 6.9%`,
+        cardForeground: "0 0% 98%",
+        popover: `${primaryHSL.h} ${Math.max(Math.min(primaryHSL.s * 0.15, 20), 5)}% 6.9%`,
+        popoverForeground: "0 0% 98%",
+        primary: `${primaryHSL.h} ${Math.min(primaryHSL.s + 10, 100)}% 80%`,
+        primaryForeground: `${primaryHSL.h} ${primaryHSL.s}% 10%`,
+        secondary: `${secondaryHSL.h} ${Math.min(secondaryHSL.s + 10, 100)}% 70%`,
+        secondaryForeground: "0 0% 98%",
+        muted: `${secondaryHSL.h} ${Math.max(secondaryHSL.s - 30, 0)}% 15.9%`,
+        mutedForeground: `${secondaryHSL.h} ${Math.max(secondaryHSL.s - 25, 0)}% 64.9%`,
+        accent: `${primaryHSL.h} ${Math.max(primaryHSL.s - 20, 0)}% 25%`,
+        accentForeground: "0 0% 98%",
+        destructive: "0 62.8% 30.6%",
+        destructiveForeground: "0 0% 98%",
+        border: `${primaryHSL.h} ${Math.max(primaryHSL.s - 30, 0)}% 15.9%`,
+        input: `${primaryHSL.h} ${Math.max(primaryHSL.s - 30, 0)}% 15.9%`,
+        ring: `${primaryHSL.h} ${Math.max(primaryHSL.s - 10, 0)}% 86.9%`,
+        chart1: `${primaryHSL.h} 70% 50%`,
+        chart2: `${secondaryHSL.h} 60% 45%`,
+        chart3: `${(primaryHSL.h + 180) % 360} 80% 55%`,
+        chart4: `${(secondaryHSL.h + 180) % 360} 65% 60%`,
+        chart5: `${(primaryHSL.h + secondaryHSL.h) / 2} 75% 55%`,
+      }
+
+      setLightPalette(light)
+      setDarkPalette(dark)
+    } catch (error) {
+      console.error("Error generating duotone palettes:", error)
+    }
+  }
+
   // Add this function to apply the palette to the theme customizer
   const applyPalette = () => {
     if (primaryColor && primaryColor.startsWith("#")) {
-      onApplyPalette(primaryColor)
-      toast({
-        title: "Applied!",
-        description: "Color palette applied to theme customizer",
-      })
+      if (paletteMode === "duotone" && secondaryColor && secondaryColor.startsWith("#")) {
+        onApplyPalette(primaryColor, secondaryColor, paletteMode)
+        toast({
+          title: "Applied!",
+          description: "Duotone color palette applied to theme customizer",
+        })
+      } else if (paletteMode === "single") {
+        onApplyPalette(primaryColor, undefined, paletteMode)
+        toast({
+          title: "Applied!",
+          description: "Color palette applied to theme customizer",
+        })
+      } else {
+        toast({
+          title: "Error",
+          description: "Please enter valid hex colors",
+          variant: "destructive",
+        })
+      }
     } else {
       toast({
         title: "Error",
@@ -283,6 +383,15 @@ export function ColorPaletteGenerator({ onApplyPalette }: ColorPaletteGeneratorP
     setPrimaryColor(randomColor)
   }
 
+  const randomizeSecondaryColor = () => {
+    const randomColor =
+      "#" +
+      Math.floor(Math.random() * 16777215)
+        .toString(16)
+        .padStart(6, "0")
+    setSecondaryColor(randomColor)
+  }
+
   const ColorSwatch = ({ color, name }: { color: string; name: string }) => {
     return (
       <div className="flex items-center gap-2 mb-2">
@@ -297,31 +406,76 @@ export function ColorPaletteGenerator({ onApplyPalette }: ColorPaletteGeneratorP
 
   return (
     <div className="space-y-6">
-      {/* Add a button to apply the palette */}
-      {/* Add this after the randomize button in the top section */}
-      <div className="grid gap-4 md:grid-cols-2">
-        <div>
-          <Label htmlFor="primary-color">Primary Color</Label>
-          <div className="flex gap-2 mt-1.5">
-            <Input
-              id="primary-color"
-              type="color"
-              value={primaryColor}
-              onChange={(e) => setPrimaryColor(e.target.value)}
-              className="w-16 h-10 p-1"
-            />
-            <Input
-              type="text"
-              value={primaryColor}
-              onChange={(e) => setPrimaryColor(e.target.value)}
-              placeholder="#000000"
-              className="flex-1"
-            />
-            <Button variant="outline" size="icon" onClick={randomizeColor} title="Randomize">
-              <RefreshCw className="h-4 w-4" />
-            </Button>
-          </div>
+      <div className="space-y-4">
+        <div className="flex flex-col space-y-1.5">
+          <Label htmlFor="palette-mode">Palette Mode</Label>
+          <RadioGroup
+            id="palette-mode"
+            value={paletteMode}
+            onValueChange={(value) => setPaletteMode(value as PaletteMode)}
+            className="flex space-x-4"
+          >
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="single" id="single" />
+              <Label htmlFor="single">Single Color</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="duotone" id="duotone" />
+              <Label htmlFor="duotone">Duotone</Label>
+            </div>
+          </RadioGroup>
         </div>
+
+        <div className="grid gap-4 md:grid-cols-2">
+          <div>
+            <Label htmlFor="primary-color">Primary Color</Label>
+            <div className="flex gap-2 mt-1.5">
+              <Input
+                id="primary-color"
+                type="color"
+                value={primaryColor}
+                onChange={(e) => setPrimaryColor(e.target.value)}
+                className="w-16 h-10 p-1"
+              />
+              <Input
+                type="text"
+                value={primaryColor}
+                onChange={(e) => setPrimaryColor(e.target.value)}
+                placeholder="#000000"
+                className="flex-1"
+              />
+              <Button variant="outline" size="icon" onClick={randomizeColor} title="Randomize">
+                <RefreshCw className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+          
+          {paletteMode === "duotone" && (
+            <div>
+              <Label htmlFor="secondary-color">Secondary Color</Label>
+              <div className="flex gap-2 mt-1.5">
+                <Input
+                  id="secondary-color"
+                  type="color"
+                  value={secondaryColor}
+                  onChange={(e) => setSecondaryColor(e.target.value)}
+                  className="w-16 h-10 p-1"
+                />
+                <Input
+                  type="text"
+                  value={secondaryColor}
+                  onChange={(e) => setSecondaryColor(e.target.value)}
+                  placeholder="#6366f1"
+                  className="flex-1"
+                />
+                <Button variant="outline" size="icon" onClick={randomizeSecondaryColor} title="Randomize">
+                  <RefreshCw className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
+
         <div className="flex items-end">
           <Button className="w-full" onClick={applyPalette}>
             Apply to Theme Customizer

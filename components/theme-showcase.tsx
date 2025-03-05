@@ -36,7 +36,7 @@ import { DemoSidebar } from "./demo-sidebar"
 import { DemoPagination } from "./demo-pagination"
 import { SidebarProvider, SidebarTrigger } from "./ui/sidebar"
 import { Toaster } from "./ui/toaster"
-import { generateColorPalette } from "@/lib/utils"
+import { generateColorPalette, generateDuotoneColorPalette } from "@/lib/utils"
 import { getDefaultColors } from "@/lib/theme-config"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { usePaletteStore, initializePaletteStore } from "@/lib/store"
@@ -77,8 +77,11 @@ export default function ThemeShowcase() {
     setIsDarkMode(!isDarkMode)
   }
 
-  const applyGeneratedPalette = async (primaryColor: string) => {
-    const palette = generateColorPalette(primaryColor)
+  const applyGeneratedPalette = async (primaryColor: string, secondaryColor?: string, mode?: "single" | "duotone") => {
+    // Generate the appropriate palette based on mode
+    const palette = mode === "duotone" && secondaryColor 
+      ? generateDuotoneColorPalette(primaryColor, secondaryColor)
+      : generateColorPalette(primaryColor)
 
     // Convert palette format to match the format used by ThemeCustomizer
     const newLightColors = Object.entries(palette.light).reduce(
