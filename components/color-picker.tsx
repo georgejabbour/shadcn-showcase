@@ -200,17 +200,31 @@ interface RadiusControlProps {
 
 function RadiusControl({ value, onChange }: RadiusControlProps) {
   const handleIncrement = () => {
-    onChange(Math.min(value + 0.125, 2))
+    const newValue = Math.min(value + 0.125, 2);
+    onChange(newValue);
+    
+    // Apply the change to CSS variables immediately
+    const root = document.documentElement;
+    root.style.setProperty("--radius", `${newValue}rem`);
   }
 
   const handleDecrement = () => {
-    onChange(Math.max(value - 0.125, 0))
+    const newValue = Math.max(value - 0.125, 0);
+    onChange(newValue);
+    
+    // Apply the change to CSS variables immediately
+    const root = document.documentElement;
+    root.style.setProperty("--radius", `${newValue}rem`);
   }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = Number.parseFloat(e.target.value)
+    const newValue = Number.parseFloat(e.target.value);
     if (!isNaN(newValue) && newValue >= 0 && newValue <= 2) {
-      onChange(newValue)
+      onChange(newValue);
+      
+      // Apply the change to CSS variables immediately
+      const root = document.documentElement;
+      root.style.setProperty("--radius", `${newValue}rem`);
     }
   }
 
@@ -330,9 +344,37 @@ export function ThemeCustomizer({
   // Handle color change
   const handleColorChange = (mode: "light" | "dark", key: string, value: string) => {
     if (mode === "light") {
-      setLightColors({ ...lightColors, [key]: value })
+      // Create a new object to ensure state update
+      const newLightColors = { ...lightColors, [key]: value };
+      setLightColors(newLightColors);
+      
+      // Apply the change to CSS variables immediately
+      const root = document.documentElement;
+      root.style.setProperty(key, value);
     } else {
-      setDarkColors({ ...darkColors, [key]: value })
+      // Create a new object to ensure state update
+      const newDarkColors = { ...darkColors, [key]: value };
+      setDarkColors(newDarkColors);
+      
+      // If in dark mode, apply the change to CSS variables immediately
+      if (isDarkMode) {
+        const root = document.documentElement;
+        root.style.setProperty(key, value);
+      }
+      
+      // Update the dark mode style element
+      const darkModeStyles = Object.entries({ ...darkColors, [key]: value })
+        .map(([k, v]) => `${k}: ${v};`)
+        .join(" ");
+      
+      const styleId = "theme-dark-colors";
+      let styleEl = document.getElementById(styleId) as HTMLStyleElement;
+      if (!styleEl) {
+        styleEl = document.createElement("style");
+        styleEl.id = styleId;
+        document.head.appendChild(styleEl);
+      }
+      styleEl.textContent = `.dark {\n  ${darkModeStyles}\n}`;
     }
   }
 

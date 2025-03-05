@@ -39,28 +39,42 @@ import { Toaster } from "./ui/toaster"
 import { generateColorPalette } from "@/lib/utils"
 import { getDefaultColors } from "@/lib/theme-config"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { usePaletteStore, initializePaletteStore } from "@/lib/store"
 
 export default function ThemeShowcase() {
-  const [isDarkMode, setIsDarkMode] = useState(true)
+  const { 
+    isDarkMode, 
+    lightColors, 
+    darkColors, 
+    borderRadius, 
+    setIsDarkMode, 
+    setLightColors, 
+    setDarkColors, 
+    setBorderRadius, 
+    resetTheme: storeResetTheme,
+    loadSavedPalettes 
+  } = usePaletteStore();
+  
   const [dialogOpen, setDialogOpen] = useState(false)
   const [placeholderDialogOpen, setPlaceholderDialogOpen] = useState(false)
-  const [lightColors, setLightColors] = useState(() => {
-    const defaults = getDefaultColors("light")
-    return defaults || {} // Ensure we never have undefined
-  })
-  const [darkColors, setDarkColors] = useState(() => {
-    const defaults = getDefaultColors("dark")
-    return defaults || {} // Ensure we never have undefined
-  })
-  const [borderRadius, setBorderRadius] = useState(0.5)
+
+  // Load saved palettes when the component mounts
+  useEffect(() => {
+    // Initialize the palette database and load saved palettes
+    initializePaletteStore().catch(error => {
+      console.error("Failed to initialize palette store:", error)
+    })
+    
+    // Set the dark mode class based on the store value
+    if (isDarkMode) {
+      document.documentElement.classList.add("dark")
+    } else {
+      document.documentElement.classList.remove("dark")
+    }
+  }, [isDarkMode])
 
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode)
-    if (isDarkMode) {
-      document.documentElement.classList.remove("dark")
-    } else {
-      document.documentElement.classList.add("dark")
-    }
   }
 
   const applyGeneratedPalette = async (primaryColor: string) => {
@@ -83,7 +97,7 @@ export default function ThemeShowcase() {
       {} as Record<string, string>,
     )
 
-    // Update state
+    // Update store state
     setLightColors(newLightColors)
     setDarkColors(newDarkColors)
 
@@ -135,24 +149,9 @@ export default function ThemeShowcase() {
     setIsDarkMode(currentThemeState)
   }
 
+  // Use the store's reset function
   const resetTheme = () => {
-    // Reset to default colors
-    const defaultLightColors = getDefaultColors("light")
-    const defaultDarkColors = getDefaultColors("dark")
-
-    setLightColors(defaultLightColors)
-    setDarkColors(defaultDarkColors)
-    setBorderRadius(0.5)
-
-    // Reset CSS variables
-    const root = document.documentElement
-    root.style.cssText = ""
-
-    // Remove the dark mode style element if it exists
-    const styleEl = document.getElementById("theme-dark-colors")
-    if (styleEl) {
-      styleEl.remove()
-    }
+    storeResetTheme();
   }
 
   useEffect(() => {

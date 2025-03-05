@@ -5,8 +5,8 @@ export interface Palette {
   id?: number;
   name: string;
   createdAt: Date;
-  lightColors: Record<string, string>;
-  darkColors: Record<string, string>;
+  lightColors: Record<string, any>;
+  darkColors: Record<string, any>;
   borderRadius: number;
 }
 
@@ -27,14 +27,22 @@ export const db = new PaletteDatabase();
 
 // Helper functions for palette operations
 export async function savePalette(palette: Omit<Palette, 'id' | 'createdAt'>): Promise<number> {
-  return await db.palettes.add({
+  const formattedPalette = {
     ...palette,
     createdAt: new Date()
-  });
+  };
+  
+  return await db.palettes.add(formattedPalette);
 }
 
 export async function getPalettes(): Promise<Palette[]> {
-  return await db.palettes.orderBy('createdAt').reverse().toArray();
+  try {
+    const palettes = await db.palettes.orderBy('createdAt').reverse().toArray();
+    return palettes;
+  } catch (error) {
+    console.error('Error fetching palettes:', error);
+    return [];
+  }
 }
 
 export async function deletePalette(id: number): Promise<void> {
@@ -42,5 +50,10 @@ export async function deletePalette(id: number): Promise<void> {
 }
 
 export async function getPalette(id: number): Promise<Palette | undefined> {
-  return await db.palettes.get(id);
+  try {
+    return await db.palettes.get(id);
+  } catch (error) {
+    console.error(`Error fetching palette with id ${id}:`, error);
+    return undefined;
+  }
 } 

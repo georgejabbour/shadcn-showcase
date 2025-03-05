@@ -73,6 +73,13 @@ export const usePaletteStore = create<PaletteState>()(
       // Palette management
       savePalette: async (name: string) => {
         const { lightColors, darkColors, borderRadius } = get();
+        
+        // Log the values being saved for debugging
+        console.log("Store - Saving palette:", name);
+        console.log("Store - Light colors:", lightColors);
+        console.log("Store - Dark colors:", darkColors);
+        console.log("Store - Border radius:", borderRadius);
+        
         const id = await dbSavePalette({
           name,
           lightColors,
@@ -88,15 +95,64 @@ export const usePaletteStore = create<PaletteState>()(
       loadPalette: async (id: number) => {
         const palette = await getPalette(id);
         if (palette) {
+          // Ensure we're working with the correct data format
+          // The palette data might be stored as objects with nested properties
+          let processedLightColors = palette.lightColors;
+          let processedDarkColors = palette.darkColors;
+          
+          // Check if lightColors/darkColors are objects with nested properties
+          // This handles the format seen in the screenshot where colors are stored with nested properties
+          if (palette.lightColors && typeof palette.lightColors === 'object') {
+            if ('name' in palette.lightColors || 'background' in palette.lightColors || 'foreground' in palette.lightColors) {
+              // Convert the nested structure to a flat CSS variable format
+              processedLightColors = Object.entries(palette.lightColors).reduce((acc, [key, value]) => {
+                if (key === 'name' || key === 'id') return acc; // Skip non-color properties
+                
+                if (typeof value === 'object' && value !== null) {
+                  // Handle nested color objects (like in the screenshot)
+                  Object.entries(value).forEach(([nestedKey, nestedValue]) => {
+                    if (nestedKey !== 'name' && nestedKey !== 'id') {
+                      acc[`--${key}-${nestedKey}`] = nestedValue as string;
+                    }
+                  });
+                } else {
+                  acc[`--${key}`] = value as string;
+                }
+                return acc;
+              }, {} as Record<string, string>);
+            }
+          }
+          
+          if (palette.darkColors && typeof palette.darkColors === 'object') {
+            if ('name' in palette.darkColors || 'background' in palette.darkColors || 'foreground' in palette.darkColors) {
+              // Convert the nested structure to a flat CSS variable format
+              processedDarkColors = Object.entries(palette.darkColors).reduce((acc, [key, value]) => {
+                if (key === 'name' || key === 'id') return acc; // Skip non-color properties
+                
+                if (typeof value === 'object' && value !== null) {
+                  // Handle nested color objects (like in the screenshot)
+                  Object.entries(value).forEach(([nestedKey, nestedValue]) => {
+                    if (nestedKey !== 'name' && nestedKey !== 'id') {
+                      acc[`--${key}-${nestedKey}`] = nestedValue as string;
+                    }
+                  });
+                } else {
+                  acc[`--${key}`] = value as string;
+                }
+                return acc;
+              }, {} as Record<string, string>);
+            }
+          }
+          
           set({
-            lightColors: palette.lightColors,
-            darkColors: palette.darkColors,
+            lightColors: processedLightColors,
+            darkColors: processedDarkColors,
             borderRadius: palette.borderRadius
           });
           
           // Apply to CSS variables
           const { isDarkMode } = get();
-          const colors = isDarkMode ? palette.darkColors : palette.lightColors;
+          const colors = isDarkMode ? processedDarkColors : processedLightColors;
           const root = document.documentElement;
           
           // Apply border radius
@@ -108,7 +164,7 @@ export const usePaletteStore = create<PaletteState>()(
           });
           
           // Apply dark colors inside the .dark selector scope
-          const darkModeStyles = Object.entries(palette.darkColors)
+          const darkModeStyles = Object.entries(processedDarkColors)
             .map(([key, value]) => `${key}: ${value};`)
             .join(" ");
           
@@ -142,4 +198,21 @@ export const usePaletteStore = create<PaletteState>()(
       })
     }
   )
-); 
+);
+
+// Utility function to initialize the palette store
+export const initializePaletteStore = async () => {
+  try {
+    // Load saved palettes
+    await usePaletteStore.getState().loadSavedPalettes();
+    
+    // Log the number of palettes loaded
+    const palettes = usePaletteStore.getState().savedPalettes;
+    console.log(`Initialized palette store with ${palettes.length} palettes`);
+    
+    return true;
+  } catch (error) {
+    console.error('Failed to initialize palette store:', error);
+    return false;
+  }
+}; 
