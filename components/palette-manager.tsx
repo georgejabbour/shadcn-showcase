@@ -91,10 +91,11 @@ export function PaletteManager() {
     setBorderRadius,
     setShowActionsContainer,
     showActionsContainer,
+    saveDialogOpen,
+    setSaveDialogOpen
   } = usePaletteStore();
 
   const [paletteName, setPaletteName] = useState("");
-  const [saveDialogOpen, setSaveDialogOpen] = useState(false);
   const [importDialogOpen, setImportDialogOpen] = useState(false);
   const [importData, setImportData] = useState("");
   const [importError, setImportError] = useState("");
