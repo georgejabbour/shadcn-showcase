@@ -22,6 +22,8 @@ import { ColorPicker as SquareColorPicker } from "./color-picker-square";
 import { hslToHex, hexToHsl } from "@/lib/utils";
 import { themeColors, type ColorConfig } from "@/lib/theme-config";
 import { usePaletteStore } from "@/lib/store";
+import { CATEGORY_IDS, CategoryId, useCategoryStore } from "@/lib/category-store";
+
 interface ColorPickerProps {
   label: string;
   colorKey: string;
@@ -378,11 +380,13 @@ interface ThemeCustomizerProps {
 // Group colors by their logical categories
 const colorCategories = [
   {
+    id: CATEGORY_IDS.BASE,
     name: "Base",
     description: "Primary background and text colors",
     colors: ["--background", "--foreground"],
   },
   {
+    id: CATEGORY_IDS.COMPONENTS,
     name: "Components",
     description: "Colors for UI components",
     colors: [
@@ -393,6 +397,7 @@ const colorCategories = [
     ],
   },
   {
+    id: CATEGORY_IDS.PRIMARY_SECONDARY,
     name: "Primary & Secondary",
     description: "Main brand colors",
     colors: [
@@ -403,6 +408,7 @@ const colorCategories = [
     ],
   },
   {
+    id: CATEGORY_IDS.ACCENTS_MUTED,
     name: "Accents & Muted",
     description: "Supporting colors",
     colors: [
@@ -413,6 +419,7 @@ const colorCategories = [
     ],
   },
   {
+    id: CATEGORY_IDS.FUNCTIONAL,
     name: "Functional",
     description: "Colors for specific functions",
     colors: [
@@ -424,6 +431,7 @@ const colorCategories = [
     ],
   },
   {
+    id: CATEGORY_IDS.GRADIENTS,
     name: "Gradients",
     description: "Colors for gradients",
     colors: ["--gradient-one", "--gradient-two"],
@@ -439,14 +447,16 @@ function ColorCategory({
   onChange,
   isDarkMode,
 }: {
-  category: { name: string; description: string; colors: string[] };
+  category: { id: CategoryId; name: string; description: string; colors: string[] };
   colors: ColorConfig[];
   mode: "light" | "dark";
   colorValues: Record<string, string>;
   onChange: (mode: "light" | "dark", key: string, value: string) => void;
   isDarkMode: boolean;
 }) {
-  const [isOpen, setIsOpen] = useState(true);
+  const { openCategories, toggleCategory } = useCategoryStore();
+  const isOpen = openCategories[category.id];
+  
   const filteredColors = colors.filter((color) =>
     category.colors.includes(color.colorKey)
   );
@@ -455,7 +465,7 @@ function ColorCategory({
     <div className="mb-6 border rounded-lg p-4">
       <div
         className="flex justify-between items-center cursor-pointer"
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => toggleCategory(category.id)}
       >
         <div>
           <h3 className="text-lg font-medium">{category.name}</h3>
@@ -660,7 +670,7 @@ export function ThemeCustomizer({
                   <>
                     {colorCategories.map((category) => (
                       <ColorCategory
-                        key={category.name}
+                        key={category.id}
                         category={category}
                         colors={themeColors}
                         mode="light"
@@ -693,7 +703,7 @@ export function ThemeCustomizer({
                   <>
                     {colorCategories.map((category) => (
                       <ColorCategory
-                        key={category.name}
+                        key={category.id}
                         category={category}
                         colors={themeColors}
                         mode="dark"
