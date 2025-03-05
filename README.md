@@ -30,6 +30,7 @@ A powerful tool for generating, customizing, and previewing shadcn/ui component 
   - Export palettes as JSON
   - Import palettes from JSON files
   - Manage saved palettes
+  - Edit and Overwrite saved palettes
 - **Component Showcase**: Preview sample shadcn/ui components with your custom theme in real-time
 - **Responsive Design**: Works on desktop and mobile devices
 - **Dark/Light Mode**: Toggle between dark and light mode to preview your theme in both contexts
