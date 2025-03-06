@@ -625,7 +625,7 @@ export function PaletteManager() {
       icon: Trash2,
       onClick: (palette: Palette) => {
         // Prevent deletion of the default palette
-        if (palette.name === "Default Palette" || savedPalettes.length === 1) {
+        if (palette.name === "Default Palette") {
           toast({
             title: "Cannot Delete Default Palette",
             description:
