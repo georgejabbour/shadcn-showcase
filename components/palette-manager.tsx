@@ -39,6 +39,7 @@ import {
   MoreHorizontal,
   ChevronDown,
   ChevronUp,
+  Code,
 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { Textarea } from "@/components/ui/textarea";
@@ -84,6 +85,9 @@ export function PaletteManager() {
   const [editingPaletteId, setEditingPaletteId] = useState<number | undefined>(
     undefined
   );
+  const [cssVariablesDialogOpen, setCssVariablesDialogOpen] = useState(false);
+  const [cssVariablesContent, setCssVariablesContent] = useState("");
+  const [cssVariablesPaletteName, setCssVariablesPaletteName] = useState("");
   const { toast } = useToast();
 
   // Load saved palettes on component mount
@@ -245,6 +249,49 @@ export function PaletteManager() {
         title: "Error exporting palette",
         description:
           "There was an error exporting your palette. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Handle exporting current palette as CSS variables
+  const handleExportCurrentAsCssVariables = () => {
+    try {
+      // Get the current colors from the store
+      const currentLightColors = usePaletteStore.getState().lightColors;
+      const currentDarkColors = usePaletteStore.getState().darkColors;
+      const currentBorderRadius = usePaletteStore.getState().borderRadius;
+      
+      // Create CSS variables for light mode
+      let cssContent = ":root {\n";
+      Object.entries(currentLightColors).forEach(([key, value]) => {
+        cssContent += `  ${key}: hsl(${value});\n`;
+      });
+      cssContent += "}\n\n";
+      
+      // Create CSS variables for dark mode
+      cssContent += ".dark {\n";
+      Object.entries(currentDarkColors).forEach(([key, value]) => {
+        cssContent += `  ${key}: hsl(${value});\n`;
+      });
+      cssContent += "}\n\n";
+      
+      // Add border radius if available
+      if (currentBorderRadius !== undefined) {
+        cssContent += ":root {\n";
+        cssContent += `  --radius: ${currentBorderRadius}rem;\n`;
+        cssContent += "}\n";
+      }
+      
+      // Set the CSS variables content and open the dialog
+      setCssVariablesContent(cssContent);
+      setCssVariablesPaletteName("Current Palette");
+      setCssVariablesDialogOpen(true);
+    } catch (error) {
+      console.error("Error generating CSS variables:", error);
+      toast({
+        title: "Error generating CSS variables",
+        description: "There was an error generating the CSS variables. Please try again.",
         variant: "destructive",
       });
     }
@@ -426,6 +473,74 @@ export function PaletteManager() {
     );
   };
 
+  // Handle exporting palette as CSS variables
+  const handleExportAsCssVariables = (palette: Palette) => {
+    try {
+      // Create CSS variables for light mode
+      let cssContent = ":root {\n";
+      Object.entries(palette.lightColors).forEach(([key, value]) => {
+        cssContent += `  ${key}: hsl(${value});\n`;
+      });
+      cssContent += "}\n\n";
+      
+      // Create CSS variables for dark mode
+      cssContent += ".dark {\n";
+      Object.entries(palette.darkColors).forEach(([key, value]) => {
+        cssContent += `  ${key}: hsl(${value});\n`;
+      });
+      cssContent += "}\n\n";
+      
+      // Add border radius if available
+      if (palette.borderRadius !== undefined) {
+        cssContent += ":root {\n";
+        cssContent += `  --radius: ${palette.borderRadius}rem;\n`;
+        cssContent += "}\n";
+      }
+      
+      // Set the CSS variables content and open the dialog
+      setCssVariablesContent(cssContent);
+      setCssVariablesPaletteName(palette.name);
+      setCssVariablesDialogOpen(true);
+    } catch (error) {
+      console.error("Error generating CSS variables:", error);
+      toast({
+        title: "Error generating CSS variables",
+        description: "There was an error generating the CSS variables. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Handle downloading CSS variables as a file
+  const handleDownloadCssVariables = () => {
+    try {
+      const blob = new Blob([cssVariablesContent], { type: "text/css" });
+      const url = URL.createObjectURL(blob);
+      
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${cssVariablesPaletteName.replace(/\s+/g, "-").toLowerCase()}-variables.css`;
+      document.body.appendChild(a);
+      a.click();
+      
+      // Clean up
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      toast({
+        title: "CSS variables downloaded",
+        description: "Your CSS variables have been downloaded as a CSS file.",
+      });
+    } catch (error) {
+      console.error("Error downloading CSS variables:", error);
+      toast({
+        title: "Error downloading CSS variables",
+        description: "There was an error downloading the CSS variables. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   // Handle editing a palette name
   const handleEditPalette = (palette: Palette) => {
     setPaletteName(palette.name);
@@ -497,6 +612,12 @@ export function PaletteManager() {
       label: "Export palette",
       icon: Download,
       onClick: (palette: Palette) => handleExportPalette(palette),
+    },
+    {
+      id: "css-variables",
+      label: "Export as CSS variables",
+      icon: Code,
+      onClick: (palette: Palette) => handleExportAsCssVariables(palette),
     },
     {
       id: "delete",
@@ -728,7 +849,7 @@ export function PaletteManager() {
                                   .filter(
                                     (_action, index) =>
                                       (palette.name == "Default Palette" &&
-                                        index == 0) ||
+                                        (index == 0 || index == 3 || index == 4)) ||
                                       (palette.name !== "Default Palette" &&
                                         index > 0)
                                   )
@@ -803,17 +924,31 @@ export function PaletteManager() {
                     share or import later.
                   </p>
 
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button onClick={handleExportCurrentPalette}>
-                        <Download className="h-4 w-4 mr-2" />
-                        Export Current Palette
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Save your current palette as a JSON file</p>
-                    </TooltipContent>
-                  </Tooltip>
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button onClick={handleExportCurrentPalette}>
+                          <Download className="h-4 w-4 mr-2" />
+                          Export as JSON
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Save your current palette as a JSON file</p>
+                      </TooltipContent>
+                    </Tooltip>
+
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button onClick={handleExportCurrentAsCssVariables} variant="outline">
+                          <Code className="h-4 w-4 mr-2" />
+                          Export as CSS Variables
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>View and export your current palette as CSS variables</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
                 </div>
 
                 <Separator />
@@ -896,6 +1031,53 @@ export function PaletteManager() {
             </TabsContent>
           </Tabs>
         )}
+        
+        {/* CSS Variables Dialog */}
+        <Dialog
+          open={cssVariablesDialogOpen}
+          onOpenChange={setCssVariablesDialogOpen}
+        >
+          <DialogContent className="max-w-3xl">
+            <DialogHeader>
+              <DialogTitle>CSS Variables for {cssVariablesPaletteName}</DialogTitle>
+              <DialogDescription>
+                Copy these CSS variables to use in your project or download as a CSS file.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="py-4">
+              <ScrollArea className="h-[300px] w-full border rounded-md p-4 bg-muted/30">
+                <pre className="font-mono text-sm whitespace-pre-wrap">
+                  {cssVariablesContent}
+                </pre>
+              </ScrollArea>
+            </div>
+            <DialogFooter className="flex justify-between items-center">
+              <div>
+                <Button
+                  variant="outline"
+                  onClick={() => copyToClipboard(cssVariablesContent, "CSS Variables")}
+                  className="mr-2"
+                >
+                  <Copy className="h-4 w-4 mr-2" />
+                  Copy to Clipboard
+                </Button>
+              </div>
+              <div>
+                <Button
+                  variant="outline"
+                  onClick={() => setCssVariablesDialogOpen(false)}
+                  className="mr-2"
+                >
+                  Cancel
+                </Button>
+                <Button onClick={handleDownloadCssVariables}>
+                  <Download className="h-4 w-4 mr-2" />
+                  Download CSS File
+                </Button>
+              </div>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </CardContent>
     </Card>
   );
