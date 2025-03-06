@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Moon, Sun, ChevronDown, ChevronUp } from "lucide-react";
+import { Moon, Sun, ChevronDown, ChevronUp, Computer, SlidersHorizontal, Folder } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -245,19 +245,22 @@ export default function ThemeShowcase() {
                 >
                   <div className="flex flex-wrap items-center gap-4 justify-between pb-2 mb-2">
                     <TabsList className="flex w-fit">
-                      <TabsTrigger value="generator">
+                      <TabsTrigger value="generator" className="flex items-center">
+                        <Computer className="w-4 h-4 mr-2" />
                         <span className="hidden md:block">
                           Palette Generator
                         </span>
                         <span className="block md:hidden">Palet. Gen.</span>
                       </TabsTrigger>
-                      <TabsTrigger value="customizer">
+                      <TabsTrigger value="customizer" className="flex items-center">
+                        <SlidersHorizontal className="w-4 h-4 mr-2" />
                         <span className="hidden md:block">
                           Theme Customizer
                         </span>
                         <span className="block md:hidden">Theme Cust.</span>
                       </TabsTrigger>
-                      <TabsTrigger value="manager">
+                      <TabsTrigger value="manager" className="flex items-center">
+                        <Folder className="w-4 h-4 mr-2" />
                         <span className="hidden md:block">Palette Manager</span>
                         <span className="block md:hidden">Palet. Mgr</span>
                       </TabsTrigger>

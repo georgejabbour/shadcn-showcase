@@ -538,8 +538,8 @@ export function PaletteManager() {
         {showActionsContainer && (
           <Tabs defaultValue="saved">
             <TabsList className="flex w-fit">
-              <TabsTrigger value="saved">Saved Palettes</TabsTrigger>
-              <TabsTrigger value="import-export">Import/Export</TabsTrigger>
+              <TabsTrigger value="saved" className="flex items-center"><Save className="w-4 h-4 mr-2" />Saved Palettes</TabsTrigger>
+              <TabsTrigger value="import-export" className="flex items-center"><Upload className="w-4 h-4 mr-2" />Import/Export</TabsTrigger>
             </TabsList>
 
             <TabsContent value="saved">

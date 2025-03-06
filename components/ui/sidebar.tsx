@@ -406,7 +406,8 @@ const SidebarSeparator = React.forwardRef<
     <Separator
       ref={ref}
       data-sidebar="separator"
-      className={cn("mx-2 w-auto bg-sidebar-border", className)}
+      orientation="horizontal"
+      className={cn("mx-2 w-auto bg-foreground/10", className)}
       {...props}
     />
   );
