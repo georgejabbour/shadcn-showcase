@@ -90,7 +90,6 @@ export default function ThemeShowcase() {
 
   // Initialize the palette store once when the component mounts
   useEffect(() => {
-    console.log("ThemeShowcase mounted, initializing palette store...");
     // Initialize the palette database and load saved palettes
     initializePaletteStore().catch((error) => {
       console.error("Failed to initialize palette store:", error);
@@ -232,7 +231,6 @@ export default function ThemeShowcase() {
               <div className="container mx-auto px-0 max-w-[1200px]">
                 <Tabs
                   onValueChange={(value) => {
-                    console.log("Tab value changed to:", value);
                     setTabValue(value);
                   }}
                   value={tabValue}

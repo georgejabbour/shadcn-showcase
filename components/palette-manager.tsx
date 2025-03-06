@@ -58,24 +58,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-// Debug utility function
-const debugPalette = (palette: Palette) => {
-  console.group(`Palette: ${palette.name}`);
-  console.log("ID:", palette.id);
-  console.log("Created At:", palette.createdAt);
-  console.log("Border Radius:", palette.borderRadius);
-
-  console.group("Light Colors:");
-  console.log(palette.lightColors);
-  console.groupEnd();
-
-  console.group("Dark Colors:");
-  console.log(palette.darkColors);
-  console.groupEnd();
-
-  console.groupEnd();
-};
-
 export function PaletteManager() {
   const {
     lightColors,
@@ -106,15 +88,7 @@ export function PaletteManager() {
 
   // Load saved palettes on component mount
   useEffect(() => {
-    loadSavedPalettes().then(() => {
-      // Log the loaded palettes for debugging
-      if (savedPalettes.length > 0) {
-        console.log(`Loaded ${savedPalettes.length} palettes`);
-        savedPalettes.forEach(debugPalette);
-      } else {
-        console.log("No saved palettes found");
-      }
-    });
+    loadSavedPalettes();
   }, [loadSavedPalettes, savedPalettes.length]);
 
   // Handle saving a palette
@@ -133,15 +107,6 @@ export function PaletteManager() {
     }
 
     try {
-      // Get the current state directly from the store to ensure we're saving the latest values
-      console.log("Saving palette with name:", paletteName.trim());
-
-      // Log the current state for debugging
-      const currentState = usePaletteStore.getState();
-      console.log("Current light colors:", currentState.lightColors);
-      console.log("Current dark colors:", currentState.darkColors);
-      console.log("Current border radius:", currentState.borderRadius);
-
       const id = await savePalette(paletteName.trim(), editingPaletteId);
 
       // If id is -1, the user cancelled the confirmation
@@ -172,7 +137,6 @@ export function PaletteManager() {
   // Handle loading a palette
   const handleLoadPalette = async (id: number) => {
     try {
-      console.log(`Loading palette with ID: ${id}`);
       await loadPalette(id);
 
       toast({
@@ -476,13 +440,9 @@ export function PaletteManager() {
       setEditingPaletteId(palette.id);
 
       // Get the current state directly from the store to ensure we're saving the latest values
-      console.log("Overwriting palette:", palette.name);
 
       // Log the current state for debugging
       const currentState = usePaletteStore.getState();
-      console.log("Current light colors:", currentState.lightColors);
-      console.log("Current dark colors:", currentState.darkColors);
-      console.log("Current border radius:", currentState.borderRadius);
 
       const id = await savePalette(palette.name, palette.id);
 
@@ -613,7 +573,9 @@ export function PaletteManager() {
                           id="palette-name"
                           maxLength={40}
                           value={paletteName}
-                          onChange={(e) => setPaletteName(e.target.value.trim())}
+                          onChange={(e) =>
+                            setPaletteName(e.target.value.trim())
+                          }
                           placeholder="My Awesome Theme"
                         />
                         {paletteName.length > 20 && (

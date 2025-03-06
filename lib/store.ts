@@ -135,12 +135,6 @@ export const usePaletteStore = create<PaletteState>()(
             existingPaletteId,
             onConfirm: async (isDuoTone) => {
               // Log the values being saved for debugging
-              console.log("Store - Saving palette:", name);
-              console.log("Store - Light colors:", lightColors);
-              console.log("Store - Dark colors:", darkColors);
-              console.log("Store - Border radius:", borderRadius);
-              console.log("Store - Is duo-tone:", isDuoTone);
-              console.log("Store - Existing palette ID:", existingPaletteId);
 
               const id = await dbSavePalette({
                 id: existingPaletteId,
@@ -341,13 +335,11 @@ let isStoreInitialized = false;
 export const initializePaletteStore = async () => {
   // Skip initialization on the server side
   if (typeof window === "undefined") {
-    console.log("Skipping palette store initialization on server side");
     return false;
   }
 
   // Check the module-level flag first
   if (isStoreInitialized) {
-    console.log("Palette store already initialized (module flag), skipping");
     return true;
   }
 
@@ -363,7 +355,6 @@ export const initializePaletteStore = async () => {
 
   // Also check the store flag as a backup
   if (isInitialized) {
-    console.log("Palette store already initialized (store flag), skipping");
     isStoreInitialized = true; // Sync the module flag
     return true;
   }
@@ -380,12 +371,9 @@ export const initializePaletteStore = async () => {
 
     // Get the updated palettes after loading
     const palettes = usePaletteStore.getState().savedPalettes;
-    console.log(`Initialized palette store with ${palettes.length} palettes`);
 
     // Check if there are no palettes, and if so, create a default one
     if (palettes.length === 0) {
-      console.log("No palettes found, creating default palette");
-
       const defaultId = await dbSavePalette({
         id: undefined,
         name: "Default Palette",
@@ -394,8 +382,6 @@ export const initializePaletteStore = async () => {
         borderRadius,
         isDuoTone: false,
       });
-
-      console.log(`Created default palette with ID: ${defaultId}`);
     }
 
     // Mark as initialized in the store as well
