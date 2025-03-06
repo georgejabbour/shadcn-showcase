@@ -22,7 +22,11 @@ import { ColorPicker as SquareColorPicker } from "./color-picker-square";
 import { hslToHex, hexToHsl } from "@/lib/utils";
 import { themeColors, type ColorConfig } from "@/lib/theme-config";
 import { usePaletteStore } from "@/lib/store";
-import { CATEGORY_IDS, CategoryId, useCategoryStore } from "@/lib/category-store";
+import {
+  CATEGORY_IDS,
+  CategoryId,
+  useCategoryStore,
+} from "@/lib/category-store";
 
 interface ColorPickerProps {
   label: string;
@@ -446,7 +450,12 @@ function ColorCategory({
   onChange,
   isDarkMode,
 }: {
-  category: { id: CategoryId; name: string; description: string; colors: string[] };
+  category: {
+    id: CategoryId;
+    name: string;
+    description: string;
+    colors: string[];
+  };
   colors: ColorConfig[];
   mode: "light" | "dark";
   colorValues: Record<string, string>;
@@ -455,7 +464,7 @@ function ColorCategory({
 }) {
   const { openCategories, toggleCategory } = useCategoryStore();
   const isOpen = openCategories[category.id];
-  
+
   const filteredColors = colors.filter((color) =>
     category.colors.includes(color.colorKey)
   );
@@ -591,39 +600,6 @@ export function ThemeCustomizer({
             </Button>
           </h2>
         </div>
-        <div className="flex flex-col sm:flex-row gap-2 justify-between items-start sm:items-center mb-4">
-          <div className="relative w-full sm:w-auto">
-            <Input
-              placeholder="Search colors..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full sm:w-[200px]"
-            />
-            {searchTerm && (
-              <Button
-                variant="ghost"
-                size="icon"
-                className="absolute right-0 top-0 h-full"
-                onClick={() => setSearchTerm("")}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <line x1="18" y1="6" x2="6" y2="18"></line>
-                  <line x1="6" y1="6" x2="18" y2="18"></line>
-                </svg>
-              </Button>
-            )}
-          </div>
-        </div>
 
         {showActionsContainer && (
           <>
@@ -644,6 +620,39 @@ export function ThemeCustomizer({
                 <TabsTrigger value="light">Light Mode</TabsTrigger>
                 <TabsTrigger value="dark">Dark Mode</TabsTrigger>
               </TabsList>
+              <div className="flex flex-col mt-4 sm:flex-row gap-2 justify-between items-start sm:items-center mb-4">
+                <div className="relative w-full">
+                  <Input
+                    placeholder="Search colors..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full"
+                  />
+                  {searchTerm && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="absolute right-0 top-0 h-full"
+                      onClick={() => setSearchTerm("")}
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                      </svg>
+                    </Button>
+                  )}
+                </div>
+              </div>
 
               <TabsContent value="light" className="space-y-4">
                 {searchTerm ? (
