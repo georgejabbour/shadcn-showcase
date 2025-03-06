@@ -21,7 +21,7 @@ interface PaletteState {
   showActionsContainer: boolean;
   saveDialogOpen: boolean;
   setSaveDialogOpen: (open: boolean) => void;
-  
+
   // Initialization state
   isInitialized: boolean;
   setInitialized: (initialized: boolean) => void;
@@ -67,7 +67,8 @@ export const usePaletteStore = create<PaletteState>()(
 
       // Initialization state
       isInitialized: false,
-      setInitialized: (initialized: boolean) => set({ isInitialized: initialized }),
+      setInitialized: (initialized: boolean) =>
+        set({ isInitialized: initialized }),
 
       // Theme actions
       setShowActionsContainer: (show: boolean) =>
@@ -281,7 +282,7 @@ export const usePaletteStore = create<PaletteState>()(
         const isOnlyPalette = get().savedPalettes.length === 1;
         const isDefaultPalette = palette?.name === "Default Palette";
 
-        if (isOnlyPalette || isDefaultPalette) {
+        if (isDefaultPalette) {
           useConfirmDialog.getState().open({
             title: "Cannot Delete Default Palette",
             description: `The default palette cannot be deleted. You can modify it or create new palettes instead.`,
@@ -330,7 +331,7 @@ let isStoreInitialized = false;
 // Utility function to initialize the palette store
 export const initializePaletteStore = async () => {
   // Skip initialization on the server side
-  if (typeof window === 'undefined') {
+  if (typeof window === "undefined") {
     console.log("Skipping palette store initialization on server side");
     return false;
   }
@@ -348,7 +349,7 @@ export const initializePaletteStore = async () => {
     loadSavedPalettes,
     savedPalettes,
     isInitialized,
-    setInitialized
+    setInitialized,
   } = usePaletteStore.getState();
 
   // Also check the store flag as a backup
@@ -361,7 +362,7 @@ export const initializePaletteStore = async () => {
   try {
     // Set the module flag immediately to prevent concurrent initializations
     isStoreInitialized = true;
-    
+
     // Only load palettes if we don't already have them
     if (savedPalettes.length === 0) {
       // Load saved palettes

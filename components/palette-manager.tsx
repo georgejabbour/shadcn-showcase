@@ -31,7 +31,7 @@ import {
   Upload,
   Save,
   Trash2,
-  Check,
+  Palette as PaletteIcon,
   X,
   FileJson,
   Copy,
@@ -120,6 +120,15 @@ export function PaletteManager() {
   // Handle saving a palette
   const handleSavePalette = async () => {
     if (!paletteName.trim()) {
+      return;
+    }
+
+    if (paletteName.trim() === "Default Palette") {
+      toast({
+        title: "Cannot save as 'Default Palette'",
+        description:
+          "Can't save item with name 'Default Palette'. Save as a palette with a new name instead.",
+      });
       return;
     }
 
@@ -508,7 +517,7 @@ export function PaletteManager() {
     {
       id: "load",
       label: "Load palette",
-      icon: Check,
+      icon: PaletteIcon,
       onClick: (palette: Palette) => handleLoadPalette(palette.id!),
     },
     {
@@ -602,10 +611,16 @@ export function PaletteManager() {
                         <Label htmlFor="palette-name">Palette Name</Label>
                         <Input
                           id="palette-name"
+                          maxLength={40}
                           value={paletteName}
-                          onChange={(e) => setPaletteName(e.target.value)}
+                          onChange={(e) => setPaletteName(e.target.value.trim())}
                           placeholder="My Awesome Theme"
                         />
+                        {paletteName.length > 20 && (
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {paletteName.length} / 40
+                          </p>
+                        )}
                       </div>
                       <DialogFooter>
                         <Button
@@ -747,8 +762,15 @@ export function PaletteManager() {
                             <div className="flex gap-2">
                               {/* Desktop view - show buttons with tooltips */}
                               <div className="hidden md:flex space-x-2">
-                                {palette.name !== "Default Palette" &&
-                                  paletteActions.map((action) => (
+                                {paletteActions
+                                  .filter(
+                                    (_action, index) =>
+                                      (palette.name == "Default Palette" &&
+                                        index == 0) ||
+                                      (palette.name !== "Default Palette" &&
+                                        index > 0)
+                                  )
+                                  .map((action) => (
                                     <Tooltip key={action.id}>
                                       <TooltipTrigger asChild>
                                         <Button
@@ -870,7 +892,7 @@ export function PaletteManager() {
                           id="import-data"
                           className="w-full h-[200px] p-2 border rounded-md font-mono text-sm mt-2"
                           value={importData}
-                          onChange={(e) => setImportData(e.target.value)}
+                          onChange={(e) => setImportData(e.target.value.trim())}
                           placeholder='{"name":"My Theme","lightColors":{"--primary":"222.2 47.4% 11.2%"},"darkColors":{"--primary":"210 40% 98%"},"borderRadius":0.5}'
                         />
                         {importError && (
