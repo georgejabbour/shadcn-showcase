@@ -42,6 +42,10 @@ interface PaletteState {
   loadPalette: (id: number) => Promise<void>;
   loadSavedPalettes: () => Promise<void>;
   deletePalette: (id: number) => Promise<void>;
+
+  // Main tab value
+  tabValue: string;
+  setTabValue: (tabValue: string) => void;
 }
 
 type PaletteStateCreator = StateCreator<
@@ -310,6 +314,10 @@ export const usePaletteStore = create<PaletteState>()(
           });
         });
       },
+
+      // Main tab value
+      tabValue: "generator",
+      setTabValue: (tabValue: string) => set({ tabValue }),
     })) as PaletteStateCreator,
     {
       name: "palette-storage",
@@ -320,6 +328,7 @@ export const usePaletteStore = create<PaletteState>()(
         darkColors: state.darkColors,
         savedPalettes: state.savedPalettes,
         showActionsContainer: state.showActionsContainer,
+        tabValue: state.tabValue,
       }),
     }
   )

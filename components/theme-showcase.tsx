@@ -81,11 +81,13 @@ export default function ThemeShowcase() {
     loadSavedPalettes,
     showActionsContainer,
     setShowActionsContainer,
+    tabValue,
+    setTabValue,
   } = usePaletteStore();
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [placeholderDialogOpen, setPlaceholderDialogOpen] = useState(false);
-  
+
   // Initialize the palette store once when the component mounts
   useEffect(() => {
     console.log("ThemeShowcase mounted, initializing palette store...");
@@ -228,7 +230,14 @@ export default function ThemeShowcase() {
               </header>
 
               <div className="container mx-auto px-0 max-w-[1200px]">
-                <Tabs defaultValue="generator" className="w-full mb-8">
+                <Tabs
+                  onValueChange={(value) => {
+                    console.log("Tab value changed to:", value);
+                    setTabValue(value);
+                  }}
+                  value={tabValue}
+                  className="w-full mb-8"
+                >
                   <div className="flex flex-wrap items-center gap-4 justify-between pb-2 mb-2">
                     <TabsList className="flex w-fit">
                       <TabsTrigger value="generator">
