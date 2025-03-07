@@ -1,6 +1,4 @@
 import { ImageResponse } from '@vercel/og'
-import { join } from 'path'
-import { readFileSync } from 'fs'
 
 // Route segment config
 export const runtime = 'edge'
@@ -29,11 +27,12 @@ export default async function Image() {
             background: 'linear-gradient(to bottom, #000000, #171717)',
             alignItems: 'center',
             justifyContent: 'center',
+            padding: '20px',
           }}
         >
-          {/* Use absolute URL to the image in the public directory */}
+          {/* Use a relative path to the image in the public directory */}
           <img
-            src="https://flexslot.vercel.app/shadcn-showcase.png"
+            src="/shadcn-showcase.png"
             alt="Shadcn UI Showcase"
             style={{
               maxWidth: '90%',
@@ -45,6 +44,10 @@ export default async function Image() {
       ),
       {
         ...size,
+        // Add caching options
+        headers: {
+          'Cache-Control': 'public, max-age=31536000, immutable',
+        },
       }
     )
   } catch (error) {
@@ -80,6 +83,10 @@ export default async function Image() {
       ),
       {
         ...size,
+        // Add caching options
+        headers: {
+          'Cache-Control': 'public, max-age=31536000, immutable',
+        },
       }
     )
   }
