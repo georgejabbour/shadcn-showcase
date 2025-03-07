@@ -261,28 +261,28 @@ export function PaletteManager() {
       const currentLightColors = usePaletteStore.getState().lightColors;
       const currentDarkColors = usePaletteStore.getState().darkColors;
       const currentBorderRadius = usePaletteStore.getState().borderRadius;
-      
+
       // Create CSS variables for light mode
       let cssContent = ":root {\n";
       Object.entries(currentLightColors).forEach(([key, value]) => {
         cssContent += `  ${key}: hsl(${value});\n`;
       });
       cssContent += "}\n\n";
-      
+
       // Create CSS variables for dark mode
       cssContent += ".dark {\n";
       Object.entries(currentDarkColors).forEach(([key, value]) => {
         cssContent += `  ${key}: hsl(${value});\n`;
       });
       cssContent += "}\n\n";
-      
+
       // Add border radius if available
       if (currentBorderRadius !== undefined) {
         cssContent += ":root {\n";
         cssContent += `  --radius: ${currentBorderRadius}rem;\n`;
         cssContent += "}\n";
       }
-      
+
       // Set the CSS variables content and open the dialog
       setCssVariablesContent(cssContent);
       setCssVariablesPaletteName("Current Palette");
@@ -291,7 +291,8 @@ export function PaletteManager() {
       console.error("Error generating CSS variables:", error);
       toast({
         title: "Error generating CSS variables",
-        description: "There was an error generating the CSS variables. Please try again.",
+        description:
+          "There was an error generating the CSS variables. Please try again.",
         variant: "destructive",
       });
     }
@@ -482,21 +483,21 @@ export function PaletteManager() {
         cssContent += `  ${key}: hsl(${value});\n`;
       });
       cssContent += "}\n\n";
-      
+
       // Create CSS variables for dark mode
       cssContent += ".dark {\n";
       Object.entries(palette.darkColors).forEach(([key, value]) => {
         cssContent += `  ${key}: hsl(${value});\n`;
       });
       cssContent += "}\n\n";
-      
+
       // Add border radius if available
       if (palette.borderRadius !== undefined) {
         cssContent += ":root {\n";
         cssContent += `  --radius: ${palette.borderRadius}rem;\n`;
         cssContent += "}\n";
       }
-      
+
       // Set the CSS variables content and open the dialog
       setCssVariablesContent(cssContent);
       setCssVariablesPaletteName(palette.name);
@@ -505,7 +506,8 @@ export function PaletteManager() {
       console.error("Error generating CSS variables:", error);
       toast({
         title: "Error generating CSS variables",
-        description: "There was an error generating the CSS variables. Please try again.",
+        description:
+          "There was an error generating the CSS variables. Please try again.",
         variant: "destructive",
       });
     }
@@ -516,17 +518,19 @@ export function PaletteManager() {
     try {
       const blob = new Blob([cssVariablesContent], { type: "text/css" });
       const url = URL.createObjectURL(blob);
-      
+
       const a = document.createElement("a");
       a.href = url;
-      a.download = `${cssVariablesPaletteName.replace(/\s+/g, "-").toLowerCase()}-variables.css`;
+      a.download = `${cssVariablesPaletteName
+        .replace(/\s+/g, "-")
+        .toLowerCase()}-variables.css`;
       document.body.appendChild(a);
       a.click();
-      
+
       // Clean up
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-      
+
       toast({
         title: "CSS variables downloaded",
         description: "Your CSS variables have been downloaded as a CSS file.",
@@ -535,7 +539,8 @@ export function PaletteManager() {
       console.error("Error downloading CSS variables:", error);
       toast({
         title: "Error downloading CSS variables",
-        description: "There was an error downloading the CSS variables. Please try again.",
+        description:
+          "There was an error downloading the CSS variables. Please try again.",
         variant: "destructive",
       });
     }
@@ -659,8 +664,14 @@ export function PaletteManager() {
         {showActionsContainer && (
           <Tabs defaultValue="saved">
             <TabsList className="flex w-fit">
-              <TabsTrigger value="saved" className="flex items-center"><Save className="w-4 h-4 mr-2" />Saved Palettes</TabsTrigger>
-              <TabsTrigger value="import-export" className="flex items-center"><Upload className="w-4 h-4 mr-2" />Import/Export</TabsTrigger>
+              <TabsTrigger value="saved" className="flex items-center">
+                <Save className="w-4 h-4 mr-2" />
+                Saved Palettes
+              </TabsTrigger>
+              <TabsTrigger value="import-export" className="flex items-center">
+                <Upload className="w-4 h-4 mr-2" />
+                Import/Export
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="saved">
@@ -849,9 +860,10 @@ export function PaletteManager() {
                                   .filter(
                                     (_action, index) =>
                                       (palette.name == "Default Palette" &&
-                                        (index == 0 || index == 3 || index == 4)) ||
-                                      (palette.name !== "Default Palette" &&
-                                        index > 0)
+                                        (index == 0 ||
+                                          index == 3 ||
+                                          index == 4)) ||
+                                      palette.name !== "Default Palette"
                                   )
                                   .map((action) => (
                                     <Tooltip key={action.id}>
@@ -888,17 +900,27 @@ export function PaletteManager() {
                                         Palette Actions
                                       </DropdownMenuLabel>
                                       <DropdownMenuSeparator />
-                                      {paletteActions.map((action) => (
-                                        <DropdownMenuItem
-                                          key={action.id}
-                                          onClick={() =>
-                                            action.onClick(palette)
-                                          }
-                                        >
-                                          <action.icon className="mr-2 h-4 w-4" />
-                                          {action.label}
-                                        </DropdownMenuItem>
-                                      ))}
+                                      {paletteActions
+                                        .filter(
+                                          (_action, index) =>
+                                            (palette.name ==
+                                              "Default Palette" &&
+                                              (index == 0 ||
+                                                index == 3 ||
+                                                index == 4)) ||
+                                            palette.name !== "Default Palette"
+                                        )
+                                        .map((action) => (
+                                          <DropdownMenuItem
+                                            key={action.id}
+                                            onClick={() =>
+                                              action.onClick(palette)
+                                            }
+                                          >
+                                            <action.icon className="mr-2 h-4 w-4" />
+                                            {action.label}
+                                          </DropdownMenuItem>
+                                        ))}
                                     </DropdownMenuContent>
                                   </DropdownMenu>
                                 </div>
@@ -939,13 +961,18 @@ export function PaletteManager() {
 
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <Button onClick={handleExportCurrentAsCssVariables} variant="outline">
+                        <Button
+                          onClick={handleExportCurrentAsCssVariables}
+                          variant="outline"
+                        >
                           <Code className="h-4 w-4 mr-2" />
                           Export as CSS Variables
                         </Button>
                       </TooltipTrigger>
                       <TooltipContent>
-                        <p>View and export your current palette as CSS variables</p>
+                        <p>
+                          View and export your current palette as CSS variables
+                        </p>
                       </TooltipContent>
                     </Tooltip>
                   </div>
@@ -1031,7 +1058,7 @@ export function PaletteManager() {
             </TabsContent>
           </Tabs>
         )}
-        
+
         {/* CSS Variables Dialog */}
         <Dialog
           open={cssVariablesDialogOpen}
@@ -1039,9 +1066,12 @@ export function PaletteManager() {
         >
           <DialogContent className="max-w-3xl">
             <DialogHeader>
-              <DialogTitle>CSS Variables for {cssVariablesPaletteName}</DialogTitle>
+              <DialogTitle>
+                CSS Variables for {cssVariablesPaletteName}
+              </DialogTitle>
               <DialogDescription>
-                Copy these CSS variables to use in your project or download as a CSS file.
+                Copy these CSS variables to use in your project or download as a
+                CSS file.
               </DialogDescription>
             </DialogHeader>
             <div className="py-4">
@@ -1055,7 +1085,9 @@ export function PaletteManager() {
               <div>
                 <Button
                   variant="outline"
-                  onClick={() => copyToClipboard(cssVariablesContent, "CSS Variables")}
+                  onClick={() =>
+                    copyToClipboard(cssVariablesContent, "CSS Variables")
+                  }
                   className="mr-2"
                 >
                   <Copy className="h-4 w-4 mr-2" />
