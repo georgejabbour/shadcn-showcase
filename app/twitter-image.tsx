@@ -1,4 +1,6 @@
 import { ImageResponse } from '@vercel/og'
+import { join } from 'path'
+import { readFileSync } from 'fs'
 
 // Route segment config
 export const runtime = 'edge'
@@ -15,6 +17,8 @@ export const contentType = 'image/png'
 // Image generation
 export default async function Image() {
   try {
+    // For Edge runtime, we need to use a different approach
+    // We'll create a styled container with the image embedded
     return new ImageResponse(
       (
         <div
@@ -22,17 +26,18 @@ export default async function Image() {
             display: 'flex',
             width: '100%',
             height: '100%',
-            backgroundImage: 'linear-gradient(to bottom, #000000, #171717)',
+            background: 'linear-gradient(to bottom, #000000, #171717)',
             alignItems: 'center',
             justifyContent: 'center',
           }}
         >
+          {/* Use absolute URL to the image in the public directory */}
           <img
             src="https://flexslot.vercel.app/shadcn-showcase.png"
             alt="Shadcn UI Showcase"
-            width={1200}
-            height={630}
             style={{
+              maxWidth: '90%',
+              maxHeight: '90%',
               objectFit: 'contain',
             }}
           />
